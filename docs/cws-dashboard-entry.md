@@ -18,9 +18,9 @@ Use this document to enter the CWS dashboard fields consistently. It does **not*
 - Detailed description: copy the English "Full description" from `store-listing.md`.
 - Chinese name: `Readmode｜Markdown 阅读与 HTML 预览`
 - Chinese description: copy the "中文简介" and the Chinese detailed copy from `store-listing.md`.
-- Homepage URL: **BLOCKED — publicSiteUrl must be a final HTTPS URL.**
-- Support URL: **BLOCKED — supportUrl must be a final HTTPS URL or a supported contact page.**
-- Privacy policy URL: **BLOCKED — deploy `site/privacy.html` to the same final public domain.**
+- Homepage URL: `https://cyrus2333.github.io/Readmode/`
+- Support URL: `https://github.com/Cyrus2333/Readmode/issues`
+- Privacy policy URL: `https://cyrus2333.github.io/Readmode/privacy.html`
 - Icon: `icons/icon-128.png`
 - Screenshots: `docs/store-assets/screenshot-01-markdown.png` through `screenshot-03-html-preview.png` at minimum.
 - Small promo tile: `docs/store-assets/small-tile-440x280.png`
@@ -49,6 +49,13 @@ Select **No**: all extension JavaScript, CSS, and HTML ship in the ZIP. A docume
 - It stores reader preferences, temporary preview content, and an offline license record in the browser.
 - It uses the user's existing browser session only when the user chooses to open an authenticated document link.
 - It does not use analytics or advertising and does not sell or transfer user data.
+
+## Final public URLs
+
+- Homepage: `https://cyrus2333.github.io/Readmode/`
+- Privacy policy: `https://cyrus2333.github.io/Readmode/privacy.html`
+- Terms: `https://cyrus2333.github.io/Readmode/terms.html`
+- Support: `https://github.com/Cyrus2333/Readmode/issues`
 
 ## Pre-submission gate
 

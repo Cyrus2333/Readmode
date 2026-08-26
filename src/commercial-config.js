@@ -6,5 +6,5 @@
 export const COMMERCIAL_CONFIG = Object.freeze({
   paymentUrl: '',
   supportUrl: 'https://github.com/Cyrus2333/Readmode/issues',
-  publicSiteUrl: 'https://github.com/Cyrus2333/Readmode'
+  publicSiteUrl: 'https://cyrus2333.github.io/Readmode/'
 });

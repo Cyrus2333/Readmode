@@ -33,7 +33,7 @@
 - [x] Store title and summary drafted in `store-listing.md`.
 - [ ] Screenshots show real Markdown and HTML use cases.
 - [x] No unsupported integrations or collaboration claims.
-- [ ] Support URL and privacy URL are live and final.
+- [x] Support URL and privacy URL are live and final.
 - [x] Version in manifest, package script, and release notes is `0.3.0`.
 - [ ] Chrome Web Store developer account and listing are configured.
 - [x] Release package emits a SHA-256 checksum alongside the ZIP.
@@ -44,7 +44,7 @@
 - [x] Free / Pro boundary documented.
 - [x] At least one real Pro feature implemented and gated.
 - [x] Offline signed license verifier and issuance tooling prepared.
-- [ ] Production license key pair generated and securely backed up.
+- [x] Production license key pair generated and securely backed up.
 - [ ] Choose a payment provider and supported currency/region.
 - [ ] Confirm tax, refund, and customer-support handling.
 - [ ] Configure payment URL and paid-feature wording.
