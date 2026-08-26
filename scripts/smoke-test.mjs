@@ -44,6 +44,8 @@ assert.match(viewerSource, /allow-scripts allow-forms allow-modals allow-popups/
 assert.match(viewerSource, /function prepareLiveHtmlDocument\(html, baseUrl = ''\)/);
 assert.match(viewerSource, /a\[href\^=\"#\"\]/);
 assert.match(viewerSource, /src\/live\.html/);
+assert.match(viewerSource, /readmode-live-ready/);
+assert.match(viewerSource, /isTargetViewerTab/);
 const markdownSource = await readFile(new URL('../src/markdown.js', import.meta.url), 'utf8');
 assert.match(markdownSource, /function prepareHtmlDocument\(html, baseUrl = '', options = \{\}\)/);
 assert.match(markdownSource, /candidate\.startsWith\('#'\)/);
@@ -87,6 +89,7 @@ const liveHtml = await readFile(new URL('../src/live.html', import.meta.url), 'u
 const liveJs = await readFile(new URL('../src/live.js', import.meta.url), 'utf8');
 assert.match(liveHtml, /src="live\.js"/);
 assert.match(liveJs, /document\.write\(html\)/);
+assert.match(liveJs, /readmode-live-ready/);
 const manifest = JSON.parse(await readFile(new URL('../manifest.json', import.meta.url), 'utf8'));
 const packageJson = JSON.parse(await readFile(new URL('../package.json', import.meta.url), 'utf8'));
 assert.equal(manifest.version, packageJson.version);

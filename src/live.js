@@ -10,3 +10,6 @@ window.addEventListener('message', (event) => {
   document.write(html);
   document.close();
 });
+
+// Tell the parent viewer that the sandbox listener is ready before it sends the document.
+window.parent.postMessage({ type: 'readmode-live-ready' }, '*');

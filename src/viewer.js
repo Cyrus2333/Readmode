@@ -119,13 +119,23 @@ function render() {
       // Use a manifest sandbox page instead of srcdoc/data URLs. This avoids
       // inheriting the extension page CSP while keeping the source isolated
       // from extension APIs, cookies, storage, and the parent page.
+      const liveHtml = prepareLiveHtmlDocument(rawText, baseUrl);
+      const sendLiveHtml = () => frame.contentWindow?.postMessage({
+        type: 'readmode-render-html',
+        html: liveHtml
+      }, '*');
+      // The sandbox page sends a ready message after live.js is installed.
+      // Keeping the load fallback makes this work with older packaged builds
+      // while the handshake removes the race where the first postMessage was
+      // sent before the sandbox listener existed.
+      const handleLiveReady = (event) => {
+        if (event.source !== frame.contentWindow || event.data?.type !== 'readmode-live-ready') return;
+        sendLiveHtml();
+        window.removeEventListener('message', handleLiveReady);
+      };
+      window.addEventListener('message', handleLiveReady);
+      frame.addEventListener('load', sendLiveHtml, { once: true });
       frame.src = chrome.runtime.getURL('src/live.html');
-      frame.addEventListener('load', () => {
-        frame.contentWindow?.postMessage({
-          type: 'readmode-render-html',
-          html: prepareLiveHtmlDocument(rawText, baseUrl)
-        }, '*');
-      }, { once: true });
     } else {
       frame.setAttribute('sandbox', 'allow-same-origin');
       frame.addEventListener('load', () => wireSafeHtmlAnchors(frame), { once: true });
@@ -232,8 +242,7 @@ function prepareLiveHtmlDocument(html, baseUrl = '') {
 
 chrome.runtime.onMessage.addListener(async (message) => {
   if (message?.type !== 'viewer-action') return;
-  const currentTab = await chrome.tabs.getCurrent();
-  if (message.targetTabId && currentTab?.id !== message.targetTabId) return;
+  if (message.targetTabId && !(await isTargetViewerTab(message.targetTabId))) return;
   if (message.action === 'raw') openRawDialog();
   if (message.action === 'theme') toggleTheme();
   if (message.action === 'print') printDocument();
@@ -254,6 +263,15 @@ rawDialog.addEventListener('cancel', closeRawDialog);
 chrome.storage.local.get('theme').then(({ theme }) => {
   if (theme && mode !== 'html') document.documentElement.dataset.theme = theme;
 });
+
+async function isTargetViewerTab(targetTabId) {
+  const currentTab = await chrome.tabs.getCurrent();
+  if (currentTab?.id === targetTabId) return true;
+  // Some Chromium builds return null from getCurrent() for extension pages.
+  // The active-tab fallback keeps the action scoped to the viewer tab.
+  const [activeTab] = await chrome.tabs.query({ active: true, lastFocusedWindow: true });
+  return activeTab?.id === targetTabId;
+}
 
 function syncModeToUrl() {
   const next = new URL(location.href);
