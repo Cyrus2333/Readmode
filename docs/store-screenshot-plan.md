@@ -1,6 +1,6 @@
 # Chrome Web Store Screenshot Plan
 
-Capture these from the final unpacked extension build at 1280×800. The current Store Listing dashboard also expects a 440×280 small promo tile and a 1400×560 marquee promo tile; keep those as separate, branded assets rather than reusing a screenshot. Use real documents and keep each image focused on one benefit.
+Capture these from the final unpacked extension build at 1280×800. The synthetic fixtures used for the first pass live in `examples/store-demo.md` and `examples/store-prototype.html`. The current Store Listing dashboard also expects a 440×280 small promo tile and a 1400×560 marquee promo tile; keep those as separate, branded assets rather than reusing a screenshot. Use real documents and keep each image focused on one benefit.
 
 1. **Markdown reading** — local PRD with left navigation, headings, table, alert, and code block. Caption: “Read Markdown files comfortably”.
 2. **Online attachment** — authenticated attachment link rendered as a readable document. Caption: “Turn document links into readable pages”. Do not expose private URLs or user data.
