@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Readmode</title>
+  <link rel="stylesheet" href="viewer.css?build=20260825-r2">
+</head>
+<body class="preloading">
+  <div id="loading-screen" class="loading-screen"><div class="loading-card"><span class="spinner"></span><strong>正在打开文档</strong><span>正在读取并准备阅读视图…</span></div></div>
+  <main class="layout">
+    <aside id="toc" class="toc" aria-label="文档目录"><div class="toc-empty">暂无目录</div></aside>
+    <article id="reader" class="reader"><div class="loading"><span class="spinner"></span>正在读取文档…</div></article>
+  </main>
+  <div id="error" class="error hidden"></div>
+  <dialog id="raw-dialog" class="raw-dialog">
+    <div class="dialog-head"><strong>原文</strong><form method="dialog" class="dialog-close-form"><button id="raw-close" type="submit">关闭</button></form></div>
+    <pre id="raw-content"></pre>
+  </dialog>
+  <script type="module" src="viewer.js?build=20260825-r2"></script>
+</body>
+</html>

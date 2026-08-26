@@ -1,0 +1,19 @@
+{
+  "name": "readmode-extension",
+  "private": true,
+  "version": "0.3.0",
+  "type": "module",
+  "scripts": {
+    "icons": "python3 scripts/generate-icons.py",
+    "check": "node --check src/background.js && node --check src/content-script.js && node --check src/markdown.js && node --check src/edition.js && node --check src/viewer.js && node --check src/popup.js && node --check src/options.js && node --check src/commercial-config.js && node --check scripts/smoke-test.mjs && node --check scripts/preflight.mjs && node --check scripts/release-check.mjs && node --check scripts/license-keygen.mjs && node --check scripts/issue-license.mjs && node --check scripts/configure-commercial.mjs && node --check scripts/check-site-links.mjs && node scripts/check-site-links.mjs && node scripts/smoke-test.mjs",
+    "package": "bash scripts/package.sh community",
+    "package:store": "bash scripts/package.sh store",
+    "package:community": "bash scripts/package.sh community",
+    "check:store": "node --check src/pro/license.js && node scripts/smoke-test.mjs",
+    "license:keygen": "node scripts/license-keygen.mjs",
+    "license:issue": "node scripts/issue-license.mjs",
+    "preflight": "node scripts/preflight.mjs",
+    "release:check": "node scripts/release-check.mjs",
+    "commercial:configure": "node scripts/configure-commercial.mjs"
+  }
+}

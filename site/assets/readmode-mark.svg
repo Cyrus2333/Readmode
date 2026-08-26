@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128" role="img" aria-labelledby="title desc">
+  <title id="title">Readmode</title>
+  <desc id="desc">A rounded blue square with a white reading R and mint page corner.</desc>
+  <rect width="128" height="128" rx="28" fill="#315EFB"/>
+  <path d="M80 18h24v25" fill="none" stroke="#A7F3D0" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M39 101V31h28c12.7 0 23 10.3 23 23S79.7 77 67 77H39M64 77l30 24" fill="none" stroke="#FFFFFF" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

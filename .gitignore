@@ -1,0 +1,13 @@
+# Commercial-only implementation. It is supplied by the private release
+# environment and must never be committed to the public Community repository.
+src/pro/
+
+# Local release outputs
+dist/
+.DS_Store
+
+# Credentials and signing material
+*.pem
+*.key
+.env
+.env.*

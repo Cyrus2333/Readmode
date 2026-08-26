@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>常见问题 · Readmode Markdown 与 HTML 阅读器</title>
+  <meta name="description" content="Readmode 常见问题：如何在 Chrome 中打开本地 Markdown、预览 HTML 原型、处理鉴权附件，以及安全运行原始 HTML。">
+  <meta name="keywords" content="Chrome 打开 Markdown, 本地 Markdown 阅读器, HTML 原型预览, TAPD 附件预览, Markdown viewer Chrome">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Readmode 常见问题">
+  <meta property="og:description" content="在 Chrome 中阅读 Markdown 文件和预览 HTML 原型的使用说明。">
+  <link rel="stylesheet" href="assets/site.css">
+</head>
+<body>
+<header class="site-header"><a class="logo" href="./"><img class="logo-mark" src="./assets/readmode-mark.svg" alt="" aria-hidden="true"> Readmode</a><nav><a href="index.html">首页</a><a href="pro.html">Pro</a><a href="privacy.html">隐私</a><a href="support.html">帮助</a></nav></header>
+<main class="legal">
+  <p class="eyebrow">FAQ</p>
+  <h1>常见问题</h1>
+  <h2>如何打开本地 Markdown 文件？</h2>
+  <p>在 Chrome 扩展详情中开启“允许访问文件网址”，然后直接打开 `.md` 文件。也可以点击 Readmode 图标，选择“打开本地文件”。</p>
+  <h2>如何预览 TAPD 或其他系统里的附件？</h2>
+  <p>在浏览器中打开附件链接后，点击 Readmode 图标或右键选择“在 Readmode 中打开”。如果附件需要登录，Readmode 会使用你当前浏览器已有的登录态请求，不会把文档上传到 Readmode 服务。</p>
+  <h2>为什么 HTML 原型默认没有交互？</h2>
+  <p>默认模式是安全预览，会关闭脚本、表单和嵌入内容，但尽量保留原始 CSS、图片和布局。需要交互时，在插件菜单中明确选择“运行原始 HTML”，只对可信文件使用。</p>
+  <h2>多文件 HTML 项目能否完整预览？</h2>
+  <p>单个 HTML 文件的相对 CSS、图片和字体通常可以解析。依赖多个本地文件、构建产物或服务端路由的原型，建议从原始项目目录或开发服务器打开。</p>
+  <h2>Readmode 会上传我的文件吗？</h2>
+  <p>不会。Markdown 和 HTML 的读取、解析和阅读视图都在浏览器中完成；插件不建立文档云副本，也不要求账号。</p>
+  <h2>Pro 是否需要在线验证？</h2>
+  <p>不需要。Pro 激活码由插件本地验证，插件只包含公钥。购买和发码由独立的第三方支付与人工交付流程完成。</p>
+  <div class="callout"><strong>仍然遇到问题？</strong><p>请提供 Chrome 版本、文件类型、是否为本地文件，以及不包含敏感内容的最小复现样例。正式发布前会在此处配置支持邮箱或 issue tracker。</p></div>
+</main>
+<footer>Readmode · FAQ · <a href="privacy.html">Privacy</a></footer>
+</body>
+</html>
