@@ -69,6 +69,9 @@ assert.match(popupSource, /async function openSettings\(\)/);
 assert.doesNotMatch(popupSource, /chrome\.runtime\.openOptionsPage\(\)/);
 assert.match(popupSource, /chrome\.tabs\.create\(\{ url: chrome\.runtime\.getURL\('src\/options\.html'\)/);
 assert.match(popupSource, /viewerHtmlMode \? '切回安全模式' : '启用 JS'/);
+assert.match(popupSource, /navigateViewerHtmlMode/);
+assert.match(popupSource, /chrome\.tabs\.update\(tab\.id, \{ url: next\.href \}\)/);
+assert.match(popupSource, /targetViewerUrl: tab\.url/);
 assert.match(popupSource, /aria-pressed/);
 assert.match(popupSource, /mode-switch/);
 

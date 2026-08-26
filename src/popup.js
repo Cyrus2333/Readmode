@@ -85,14 +85,32 @@ function setupViewerMenu() {
     }
     button.addEventListener('click', async () => {
       try {
-        await chrome.runtime.sendMessage({ type: 'viewer-action', action, targetTabId: tab.id });
-        if (action === 'toggle-html-mode' || action === 'run-original') window.close();
+        if (action === 'toggle-html-mode' && isViewer && viewerKind === 'html') {
+          await navigateViewerHtmlMode();
+          return;
+        }
+        await chrome.runtime.sendMessage({
+          type: 'viewer-action',
+          action,
+          targetTabId: tab.id,
+          targetViewerUrl: tab.url
+        });
+        if (action === 'run-original') window.close();
       } catch (error) {
         status.textContent = `操作失败：${error.message || '请重新打开阅读页'}`;
       }
     });
     viewerActions.appendChild(button);
   });
+}
+
+async function navigateViewerHtmlMode() {
+  if (!tab?.id || !tab.url) throw new Error('当前阅读页不可用');
+  const next = new URL(tab.url);
+  if (next.searchParams.get('htmlMode') === 'live') next.searchParams.delete('htmlMode');
+  else next.searchParams.set('htmlMode', 'live');
+  await chrome.tabs.update(tab.id, { url: next.href });
+  window.close();
 }
 
 async function setupPageRule() {

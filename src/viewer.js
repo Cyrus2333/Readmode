@@ -242,7 +242,8 @@ function prepareLiveHtmlDocument(html, baseUrl = '') {
 
 chrome.runtime.onMessage.addListener(async (message) => {
   if (message?.type !== 'viewer-action') return;
-  if (message.targetTabId && !(await isTargetViewerTab(message.targetTabId))) return;
+  if (message.targetViewerUrl && message.targetViewerUrl !== location.href) return;
+  if (!message.targetViewerUrl && message.targetTabId && !(await isTargetViewerTab(message.targetTabId))) return;
   if (message.action === 'raw') openRawDialog();
   if (message.action === 'theme') toggleTheme();
   if (message.action === 'print') printDocument();
