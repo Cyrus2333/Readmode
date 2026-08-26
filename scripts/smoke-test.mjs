@@ -82,11 +82,20 @@ assert.doesNotMatch(optionsHtml, /id="commercial-note"/);
 assert.doesNotMatch(optionsJs, /通过第三方 checkout 购买/);
 assert.doesNotMatch(optionsJs, /verifyLicenseToken/);
 
+const backgroundSource = await readFile(new URL('../src/background.js', import.meta.url), 'utf8');
+assert.ok(backgroundSource.includes("const kind = /text\\/html|application\\/xhtml/i.test(contentType || '')"));
+assert.ok(backgroundSource.includes('viewer.html?inline=${id}&kind=${kind}'));
+
 const contentScript = await readFile(new URL('../src/content-script.js', import.meta.url), 'utf8');
 assert.match(contentScript, /const shouldInspectText = hasMarkdownExtension \|\| isTextDocument \|\| Boolean\(sourcePre\)/);
 assert.match(contentScript, /function looksLikeHtmlDocument\(value\)/);
 assert.match(contentScript, /pageModes/);
 assert.doesNotMatch(contentScript, /const isCandidate = hasMarkdownExtension \|\| hasHtmlExtension/);
+
+const storePrototype = await readFile(new URL('../examples/store-prototype.html', import.meta.url), 'utf8');
+assert.match(storePrototype, /id="open-notes"/);
+assert.match(storePrototype, /<dialog id="launch-notes"/);
+assert.match(storePrototype, /showModal\(\)/);
 
 const liveHtml = await readFile(new URL('../src/live.html', import.meta.url), 'utf8');
 const liveJs = await readFile(new URL('../src/live.js', import.meta.url), 'utf8');

@@ -15,6 +15,15 @@
     .card { padding: 20px; border-radius: 18px; background: #1e293b; border: 1px solid #334155; }
     .number { color: #bfdbfe; font-size: 28px; font-weight: 800; }
     .label { color: #94a3b8; margin-top: 6px; }
+    .actions { display: flex; gap: 12px; margin-top: 32px; }
+    button { border: 0; border-radius: 12px; padding: 12px 16px; color: #0f172a; background: #bfdbfe; font: 700 14px/1.2 inherit; cursor: pointer; }
+    button:hover { background: #dbeafe; }
+    dialog { width: min(520px, calc(100% - 48px)); padding: 0; border: 1px solid #64748b; border-radius: 20px; color: #f8fafc; background: #0f172a; box-shadow: 0 24px 80px rgba(0,0,0,.55); }
+    dialog::backdrop { background: rgba(2, 6, 23, .72); backdrop-filter: blur(4px); }
+    .dialog-body { padding: 28px; }
+    .dialog-body h2 { margin: 0 0 10px; font-size: 24px; }
+    .dialog-body p { margin: 0 0 20px; font-size: 15px; }
+    .dialog-body button { color: #dbeafe; background: #1e293b; border: 1px solid #475569; }
   </style>
 </head>
 <body>
@@ -27,6 +36,19 @@
       <div class="card"><div class="number">8.4k</div><div class="label">Readers reached</div></div>
       <div class="card"><div class="number">96%</div><div class="label">Confidence score</div></div>
     </div>
+    <div class="actions"><button id="open-notes" type="button">Open launch notes</button></div>
   </main>
+  <dialog id="launch-notes" aria-labelledby="launch-notes-title">
+    <div class="dialog-body">
+      <h2 id="launch-notes-title">Launch notes</h2>
+      <p>The original HTML runtime can keep interactive behaviors alongside the visual design.</p>
+      <button id="close-notes" type="button">Close</button>
+    </div>
+  </dialog>
+  <script>
+    const notes = document.querySelector('#launch-notes');
+    document.querySelector('#open-notes')?.addEventListener('click', () => notes?.showModal());
+    document.querySelector('#close-notes')?.addEventListener('click', () => notes?.close());
+  </script>
 </body>
 </html>
