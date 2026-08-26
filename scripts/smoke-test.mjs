@@ -20,7 +20,7 @@ assert.match(unsafe.html, /href="#"/);
 const licensePath = new URL('../src/pro/license.js', import.meta.url);
 try {
   const { verifyLicenseToken } = await import(licensePath.href);
-  const validToken = 'RM1.eyJ2ZXJzaW9uIjoxLCJwcm9kdWN0IjoicmVhZG1vZGUiLCJwbGFuIjoicHJvIiwiZWRpdGlvbiI6ImxpZmV0aW1lIiwibGljZW5zZUlkIjoiU01PS0UtMjAyNjA4MjUiLCJpc3N1ZWRBdCI6IjIwMjYtMDgtMjVUMTk6MTQ6MDkuNzA4WiJ9.hfkfjrskOgS-pvewZjNIphePQmXlXThq19l9DFV8XcUP4CZkTvoPu9tR40C5SoukwY5g4FNsQ-CQdm_KkYrQzQ';
+  const validToken = 'RM1.eyJ2ZXJzaW9uIjoxLCJwcm9kdWN0IjoicmVhZG1vZGUiLCJwbGFuIjoicHJvIiwiZWRpdGlvbiI6ImxpZmV0aW1lIiwibGljZW5zZUlkIjoiU01PS0UtMjAyNjA4MjYiLCJpc3N1ZWRBdCI6IjIwMjYtMDgtMjZUMjE6MTE6MDEuNTEzWiJ9.fdJzG65GzjbgsobnvUfnBTf5Z8QsZBbGJWLXUwEV7z634Wwxj4fYWieZsiNli1MHdA4OriQ20W4FA5TeQwwZGg';
   const verified = await verifyLicenseToken(validToken);
   assert.equal(verified.valid, true);
   assert.equal(verified.payload.product, 'readmode');
