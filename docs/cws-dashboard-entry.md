@@ -1,12 +1,12 @@
-# Chrome Web Store Developer Dashboard entry sheet — Readmode 0.3.1
+# Chrome Web Store Developer Dashboard entry sheet — Readmode 0.3.2
 
 Use this document to enter the CWS dashboard fields consistently. It does **not** authorize publishing or payment collection by itself.
 
 ## Package
 
-- File: `dist/readmode-0.3.1-community.zip` (current free open-source release)
-- SHA-256: run `shasum -a 256 dist/readmode-0.3.1-community.zip` immediately before upload.
-- Version: `0.3.1`
+- File: `dist/readmode-0.3.2-community.zip` (current free open-source release)
+- SHA-256: run `shasum -a 256 dist/readmode-0.3.2-community.zip` immediately before upload.
+- Version: `0.3.2`
 - Submission mode: choose **deferred publishing** if the dashboard offers it, so review approval does not automatically make the extension public.
 
 ## Store Listing

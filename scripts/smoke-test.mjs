@@ -89,6 +89,9 @@ assert.doesNotMatch(optionsJs, /autoRender|pageModes/);
 
 const backgroundSource = await readFile(new URL('../src/background.js', import.meta.url), 'utf8');
 assert.match(backgroundSource, /chrome\.scripting\.executeScript/);
+assert.match(backgroundSource, /function registerContextMenu\(\)/);
+assert.match(backgroundSource, /void registerContextMenu\(\)/);
+assert.match(backgroundSource, /chrome\.runtime\.onStartup\.addListener/);
 assert.match(backgroundSource, /contexts: \['page'\]/);
 assert.ok(backgroundSource.includes("const kind = /text\\/html|application\\/xhtml/i.test(contentType || '')"));
 assert.ok(backgroundSource.includes('viewer.html?inline=${id}&kind=${kind}'));
@@ -112,7 +115,7 @@ assert.match(liveJs, /readmode-live-ready/);
 const manifest = JSON.parse(await readFile(new URL('../manifest.json', import.meta.url), 'utf8'));
 const packageJson = JSON.parse(await readFile(new URL('../package.json', import.meta.url), 'utf8'));
 assert.equal(manifest.version, packageJson.version);
-assert.equal(manifest.version, '0.3.1');
+assert.equal(manifest.version, '0.3.2');
 assert.equal(manifest.manifest_version, 3);
 assert.deepEqual(manifest.sandbox.pages, ['src/live.html']);
 assert.match(manifest.content_security_policy.sandbox, /sandbox allow-scripts/);

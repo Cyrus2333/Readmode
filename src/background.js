@@ -1,14 +1,35 @@
 const MENU_ID = 'readmode-open';
 
-chrome.runtime.onInstalled.addListener(() => {
-  chrome.contextMenus.removeAll().then(() => {
-    chrome.contextMenus.create({
-      id: MENU_ID,
-      title: '在 Readmode 中打开当前文档',
-      contexts: ['page']
+// Context menus can be cleared when an unpacked extension is manually
+// reloaded. Register it whenever this service worker starts, as well as after
+// installation/update and browser startup, so the user does not need to
+// reinstall Readmode to get the page action back.
+let contextMenuSetup = Promise.resolve();
+
+function registerContextMenu() {
+  contextMenuSetup = contextMenuSetup
+    .catch(() => {})
+    .then(async () => {
+      await chrome.contextMenus.removeAll();
+      await new Promise((resolve) => {
+        chrome.contextMenus.create({
+          id: MENU_ID,
+          title: '在 Readmode 中打开当前文档',
+          contexts: ['page']
+        }, () => {
+          if (chrome.runtime.lastError) {
+            console.warn('无法注册 Readmode 右键菜单：', chrome.runtime.lastError.message);
+          }
+          resolve();
+        });
+      });
     });
-  });
-});
+  return contextMenuSetup;
+}
+
+void registerContextMenu();
+chrome.runtime.onInstalled.addListener(() => { void registerContextMenu(); });
+chrome.runtime.onStartup.addListener(() => { void registerContextMenu(); });
 
 chrome.contextMenus.onClicked.addListener(async (info, tab) => {
   if (info.menuItemId !== MENU_ID || !isSupportedUrl(tab?.url)) return;

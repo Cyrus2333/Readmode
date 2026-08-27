@@ -59,7 +59,7 @@ Chrome Web Store 和 GitHub 均分发当前免费开源版本。当前不配置�
 
 ## 5. 提交顺序
 
-1. 上传 `/Users/huangjingye/Documents/project/MD-HTML预览/dist/readmode-0.3.1-community.zip`；
+1. 上传 `/Users/huangjingye/Documents/project/MD-HTML预览/dist/readmode-0.3.2-community.zip`；
 2. 填写 Store Listing；
 3. 填写 Privacy practices、single purpose、权限理由、remote code 和数据使用声明；
 4. 填写 Distribution 与支持信息；

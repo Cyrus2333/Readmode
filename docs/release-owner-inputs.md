@@ -8,7 +8,7 @@
 2. 使用最终 Chrome 版本完成本地 Markdown、在线鉴权附件、HTML 安全预览和原始运行回归；
 3. 确认最终截图不含敏感内容；
 4. 用 `npm run check`、`npm run preflight` 和 `npm run release:check` 完成检查；
-5. 上传 `dist/readmode-0.3.1-community.zip` 到 Chrome Web Store。
+5. 上传 `dist/readmode-0.3.2-community.zip` 到 Chrome Web Store。
 
 ## 未来商业化时再处理
 

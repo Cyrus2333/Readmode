@@ -34,7 +34,7 @@
 - [x] Screenshots show real Markdown and HTML use cases.
 - [x] No unsupported integrations or collaboration claims.
 - [x] Support URL and privacy URL are live and final.
-- [x] Version in manifest, package script, and release notes is `0.3.1`.
+- [x] Version in manifest, package script, and release notes is `0.3.2`.
 - [ ] Chrome Web Store developer account and listing are configured.
 - [x] Release package emits a SHA-256 checksum alongside the ZIP.
 - [x] Static website links are checked automatically.
