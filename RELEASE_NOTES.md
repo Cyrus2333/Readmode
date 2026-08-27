@@ -1,7 +1,7 @@
-# Readmode 0.3.0
+# Readmode 0.3.1
 
-- HTML 自动识别改为保守策略：仅处理 Markdown 或明确展示源码的文档，不再因为普通页面路径带 `.html` 就自动替换页面。
-- 插件菜单新增当前网址处理规则，可选择按内容自动判断、始终使用 Readmode 或保持原页面。
+- 改为用户主动触发：只有点击扩展图标或右键菜单后才读取当前文档。
+- 移除全站 host permissions 与常驻 content script，改用 `activeTab` + `scripting` 临时访问当前标签页。
 
 ## Productized pre-release
 

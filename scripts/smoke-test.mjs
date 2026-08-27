@@ -74,6 +74,9 @@ assert.match(popupSource, /chrome\.tabs\.update\(tab\.id, \{ url: next\.href \}\
 assert.match(popupSource, /targetViewerUrl: tab\.url/);
 assert.match(popupSource, /aria-pressed/);
 assert.match(popupSource, /mode-switch/);
+assert.match(popupSource, /chrome\.scripting\.executeScript/);
+assert.doesNotMatch(popupSource, /pageModes|autoRender/);
+assert.doesNotMatch(popupHtml, /id="page-rule-row"/);
 
 const optionsHtml = await readFile(new URL('../src/options.html', import.meta.url), 'utf8');
 const optionsJs = await readFile(new URL('../src/options.js', import.meta.url), 'utf8');
@@ -81,16 +84,20 @@ assert.match(optionsHtml, /STORE_PRO_SECTION/);
 assert.doesNotMatch(optionsHtml, /id="commercial-note"/);
 assert.doesNotMatch(optionsJs, /通过第三方 checkout 购买/);
 assert.doesNotMatch(optionsJs, /verifyLicenseToken/);
+assert.doesNotMatch(optionsHtml, /id="auto-render"/);
+assert.doesNotMatch(optionsJs, /autoRender|pageModes/);
 
 const backgroundSource = await readFile(new URL('../src/background.js', import.meta.url), 'utf8');
+assert.match(backgroundSource, /chrome\.scripting\.executeScript/);
+assert.match(backgroundSource, /contexts: \['page'\]/);
 assert.ok(backgroundSource.includes("const kind = /text\\/html|application\\/xhtml/i.test(contentType || '')"));
 assert.ok(backgroundSource.includes('viewer.html?inline=${id}&kind=${kind}'));
 
 const contentScript = await readFile(new URL('../src/content-script.js', import.meta.url), 'utf8');
-assert.match(contentScript, /const shouldInspectText = hasMarkdownExtension \|\| isTextDocument \|\| Boolean\(sourcePre\)/);
+assert.match(contentScript, /injected only after a user clicks Readmode/);
 assert.match(contentScript, /function looksLikeHtmlDocument\(value\)/);
-assert.match(contentScript, /pageModes/);
-assert.doesNotMatch(contentScript, /const isCandidate = hasMarkdownExtension \|\| hasHtmlExtension/);
+assert.match(contentScript, /type: 'open-inline-viewer'/);
+assert.doesNotMatch(contentScript, /pageModes|autoRender|onMessage\.addEventListener/);
 
 const storePrototype = await readFile(new URL('../examples/store-prototype.html', import.meta.url), 'utf8');
 assert.match(storePrototype, /id="open-notes"/);
@@ -105,12 +112,14 @@ assert.match(liveJs, /readmode-live-ready/);
 const manifest = JSON.parse(await readFile(new URL('../manifest.json', import.meta.url), 'utf8'));
 const packageJson = JSON.parse(await readFile(new URL('../package.json', import.meta.url), 'utf8'));
 assert.equal(manifest.version, packageJson.version);
-assert.equal(manifest.version, '0.3.0');
+assert.equal(manifest.version, '0.3.1');
 assert.equal(manifest.manifest_version, 3);
 assert.deepEqual(manifest.sandbox.pages, ['src/live.html']);
 assert.match(manifest.content_security_policy.sandbox, /sandbox allow-scripts/);
 assert.equal(Boolean(manifest.web_accessible_resources), false);
-assert.deepEqual(manifest.host_permissions, ['http://*/*', 'https://*/*', 'file:///*']);
+assert.deepEqual(manifest.permissions, ['activeTab', 'contextMenus', 'scripting', 'storage', 'tabs']);
+assert.equal(Boolean(manifest.host_permissions), false);
+assert.equal(Boolean(manifest.content_scripts), false);
 for (const page of ['index.html', 'privacy.html', 'pro.html', 'terms.html', 'support.html', 'faq.html', 'assets/site.css']) {
   const pageText = await readFile(new URL(`../site/${page}`, import.meta.url), 'utf8');
   assert.ok(pageText.length > 20, `site/${page} should not be empty`);

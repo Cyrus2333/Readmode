@@ -16,23 +16,23 @@
 
 | 权限 | 提交时说明 |
 | --- | --- |
-| `storage` | 保存用户阅读偏好、当前预览所需的临时内容，以及用户主动粘贴的本机许可证记录；不建立云端文档副本。 |
-| `tabs` | 在用户点击扩展操作后打开 Readmode viewer，或在用户选择“运行原始 HTML”时回到源页面。 |
-| `contextMenus` | 提供用户主动选择的“在 Readmode 中打开”菜单。 |
-| HTTP/HTTPS/本地文件网址 | 识别和读取用户主动打开的 Markdown/HTML 文档或附件；普通 HTML 页面不会因为路径包含 `.html` 而先读取全文。 |
+| `activeTab` + `scripting` | 仅在用户点击扩展按钮或选择右键菜单后，临时读取当前标签页并注入随扩展发布的文档提取脚本；不在所有网站常驻运行。 |
+| `storage` | 保存用户阅读偏好和当前预览所需的临时内容；不建立云端文档副本。 |
+| `tabs` | 在用户点击扩展操作后打开或更新 Readmode viewer，并在用户选择时切换阅读页。 |
+| `contextMenus` | 提供用户主动选择的“在 Readmode 中打开当前文档”菜单。 |
 
 ### Remote code
 
-选择：**No, I am not using remote code**。
+选择：**Yes, this extension uses remote code only after explicit user action**。
 
-插件的 JavaScript、CSS 和 HTML 均随扩展包发布；在线文档中的脚本只在用户主动选择“运行原始 HTML”后由源页面处理，不属于插件远程代码。
+填写理由：Readmode 不下载或执行远程扩展代码，所有扩展 JavaScript、CSS 和 HTML 均随 ZIP 发布。只有当用户明确选择“运行原始 HTML”时，所选 HTML 文档自身的脚本和外部资源才会在隔离的 Manifest V3 sandbox 页面中运行；该页面没有 Chrome 扩展 API、扩展存储、cookie 或父页面访问权限。此行为仅用于按用户请求预览交互式 HTML 原型。
 
 ## 2. Privacy practices
 
 - 隐私政策 URL：正式官网配置后填写；当前源文件为 `privacy-policy.md` 和 `site/privacy.html`。
 - 文档内容：不上传到 Readmode 后端。
 - 在线附件：使用用户当前浏览器会话访问用户已经有权限查看的 URL。
-- 本地存储：阅读设置、临时预览内容、本机许可证。
+- 本地存储：阅读设置、临时预览内容。
 - 分析/广告：当前不使用。
 - 数据出售/转移：当前不使用。
 
@@ -59,7 +59,7 @@ Chrome Web Store 和 GitHub 均分发当前免费开源版本。当前不配置�
 
 ## 5. 提交顺序
 
-1. 上传 `/Users/huangjingye/Documents/project/MD-HTML预览/dist/readmode-0.3.0-community.zip`；
+1. 上传 `/Users/huangjingye/Documents/project/MD-HTML预览/dist/readmode-0.3.1-community.zip`；
 2. 填写 Store Listing；
 3. 填写 Privacy practices、single purpose、权限理由、remote code 和数据使用声明；
 4. 填写 Distribution 与支持信息；

@@ -1,3 +1,7 @@
+/**
+ * This file is injected only after a user clicks Readmode or chooses its
+ * context-menu action. It is not a declarative, always-on content script.
+ */
 (async () => {
   if (window.top !== window) return;
   if (!['http:', 'https:', 'file:'].includes(location.protocol)) return;
@@ -6,69 +10,25 @@
   const url = new URL(source);
   const path = url.pathname.toLowerCase();
   const contentType = document.contentType || '';
+  const sourcePre = getSourcePre();
+  const visibleText = sourcePre?.textContent || getVisibleText();
   const hasMarkdownExtension = /\.(md|markdown|mkd|mdx)$/i.test(path);
   const hasHtmlExtension = /\.(html?|xhtml)$/i.test(path);
-  const isManualOpen = url.hash.replace(/^#/, '').split('&').includes('readmode-open');
-  const isSupportedLocalFile = url.protocol === 'file:' && (hasMarkdownExtension || hasHtmlExtension);
-  const pageKey = normalizePageKey(source);
+  const looksLikeHtmlSource = looksLikeHtmlDocument(visibleText);
+  const isHtml = hasHtmlExtension || /text\/html|application\/xhtml/i.test(contentType) || looksLikeHtmlSource;
+  const content = isHtml
+    ? (looksLikeHtmlSource ? visibleText : document.documentElement?.outerHTML || '')
+    : await readTextDocument(source, visibleText);
 
-  // Only inspect text when the browser is already presenting a text document,
-  // or when an .html URL is visibly rendered as a source-only <pre>. A normal
-  // HTML page can therefore keep its own layout even when its URL ends in
-  // .html.
-  const isTextDocument = /text\/(plain|markdown)/i.test(contentType);
-  const sourcePre = getSourcePre();
-  const shouldInspectText = hasMarkdownExtension || isTextDocument || Boolean(sourcePre);
-  const text = shouldInspectText
-    ? (sourcePre?.textContent || getVisibleText())
-    : '';
-  const looksLikeMarkdown = /(^|\n)#{1,6}\s+\S|```|(^|\n)\s*[-*+]\s+\S|\[[^\]]+\]\([^)]*\)/m.test(text);
-  const looksLikeHtmlSource = looksLikeHtmlDocument(text);
-  const isPlainDocument = isTextDocument && text.trim().length > 0;
-  const isCandidate = hasMarkdownExtension || (isPlainDocument && (looksLikeMarkdown || looksLikeHtmlSource));
+  if (!content.trim()) throw new Error('当前页面没有可读取的文档内容。');
 
-  const preferences = await chrome.storage.local.get({ autoRender: true, pageModes: {} });
-  const pageMode = preferences.pageModes?.[pageKey] || 'auto';
-  const shouldAutoOpen = preferences.autoRender !== false && pageMode !== 'never' && isCandidate;
-  const shouldOpen = isManualOpen || pageMode === 'always' || shouldAutoOpen;
-
-  // Local HTML files are often rendered normally by Chrome. Keep the message
-  // bridge alive for an explicit popup/menu action without auto-opening them.
-  if (url.protocol === 'file:' && (isSupportedLocalFile || pageMode === 'always' || isManualOpen)) {
-    chrome.runtime.onMessage.addListener((message) => {
-      if (message?.type === 'force-open-file-viewer') sendFileToViewer();
-    });
-  }
-
-  if (source.includes('chrome-extension://') || url.hash.includes('readmode-original')) return;
-  if (!shouldOpen) return;
-  await openCandidate();
-
-  async function openCandidate() {
-    if (url.protocol === 'file:') {
-      await sendFileToViewer();
-      return;
-    }
-    chrome.runtime.sendMessage({ type: 'open-viewer', source }).catch(() => {
-      const banner = document.createElement('button');
-      banner.textContent = '在 Readmode 中打开';
-      banner.style.cssText = 'position:fixed;z-index:2147483647;right:16px;top:16px;padding:10px 14px;border:0;border-radius:8px;background:#1d4ed8;color:#fff;font:600 14px system-ui;cursor:pointer;box-shadow:0 4px 16px #0003';
-      banner.onclick = () => chrome.runtime.sendMessage({ type: 'open-viewer', source });
-      document.documentElement.appendChild(banner);
-    });
-  }
-
-  async function sendFileToViewer() {
-    const isHtml = hasHtmlExtension || /text\/html/i.test(contentType) || /^\s*<!doctype html|^\s*<html[\s>]/i.test(text);
-    const content = isHtml ? document.documentElement?.outerHTML || '' : await readLocalText();
-    chrome.runtime.sendMessage({
-      type: 'open-inline-viewer',
-      name: decodeURIComponent(url.pathname.split('/').pop() || '本地文件'),
-      content,
-      contentType: isHtml ? 'text/html' : 'text/markdown',
-      source
-    }).catch(() => {});
-  }
+  await chrome.runtime.sendMessage({
+    type: 'open-inline-viewer',
+    name: decodeURIComponent(url.pathname.split('/').pop() || document.title || '当前文档'),
+    content,
+    contentType: isHtml ? 'text/html' : hasMarkdownExtension ? 'text/markdown' : 'text/plain',
+    source
+  });
 
   function getSourcePre() {
     const pre = document.body?.children?.length === 1 ? document.body.firstElementChild : null;
@@ -93,22 +53,15 @@
     return startsWithHtml && /<\/(?:html|body)\s*>/i.test(sample);
   }
 
-  async function readLocalText() {
-    if (text.trim()) return text;
+  async function readTextDocument(currentUrl, fallback) {
+    if (fallback.trim()) return fallback;
     try {
-      const response = await fetch(source);
+      const response = await fetch(currentUrl);
       if (response.ok) return await response.text();
-    } catch {}
-    return document.querySelector('pre')?.textContent || document.body?.textContent || '';
-  }
-
-  function normalizePageKey(value) {
-    try {
-      const normalized = new URL(value);
-      normalized.hash = '';
-      return normalized.href;
     } catch {
-      return value;
+      // The visible page text is still a useful fallback for browser-rendered
+      // text documents when a fetch is unavailable.
     }
+    return fallback;
   }
 })();

@@ -5,20 +5,13 @@
   <div class="popup">
     <div class="popup-title"><img class="mark" src="../icons/icon.svg" alt="" aria-hidden="true"><div class="popup-brand"><strong>Readmode</strong><small id="context-label">Markdown & HTML Reader</small></div><button id="settings" class="title-action" type="button">设置</button></div>
     <div id="native-view" class="view-section">
-      <button id="current" class="primary">在 Readmode 中打开当前页面</button>
+      <button id="current" class="primary">在 Readmode 中预览当前文档</button>
+      <p class="manual-hint">只会在你点击后读取当前标签页。</p>
     </div>
     <div id="viewer-view" class="view-section hidden">
       <div class="state"><span class="state-dot"></span><span id="viewer-state">当前页面已由 Readmode 渲染</span></div>
       <div id="viewer-actions" class="actions"></div>
     </div>
-    <label id="page-rule-row" class="page-rule hidden">
-      <span><strong>当前页面处理规则</strong><small id="page-rule-help">默认按页面内容自动判断</small></span>
-      <select id="page-rule" aria-label="当前页面处理规则">
-        <option value="auto">按内容自动判断</option>
-        <option value="always">始终使用 Readmode</option>
-        <option value="never">保持原页面</option>
-      </select>
-    </label>
     <label class="dropzone" for="file-input"><span>打开本地文件</span><small>支持 .md、.markdown、.html</small></label>
     <input id="file-input" type="file" accept=".md,.markdown,.mkd,.mdx,.html,.htm,text/markdown,text/plain,text/html">
     <div class="popup-footer"><span id="status" class="status"></span></div>
