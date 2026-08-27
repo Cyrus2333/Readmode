@@ -31,7 +31,7 @@
 - [x] Icons at 16, 32, 48, and 128 px.
 - [x] English and Simplified Chinese metadata added.
 - [x] Store title and summary drafted in `store-listing.md`.
-- [ ] Screenshots show real Markdown and HTML use cases.
+- [x] Screenshots show real Markdown and HTML use cases.
 - [x] No unsupported integrations or collaboration claims.
 - [x] Support URL and privacy URL are live and final.
 - [x] Version in manifest, package script, and release notes is `0.3.0`.
@@ -39,14 +39,14 @@
 - [x] Release package emits a SHA-256 checksum alongside the ZIP.
 - [x] Static website links are checked automatically.
 
-## Commercial readiness
+## Future commercialization (not required for the current free release)
 
-- [x] Free / Pro boundary documented.
-- [x] At least one real Pro feature implemented and gated.
-- [x] Offline signed license verifier and issuance tooling prepared.
-- [x] Production license key pair generated and securely backed up.
-- [ ] Choose a payment provider and supported currency/region.
-- [ ] Confirm tax, refund, and customer-support handling.
-- [ ] Configure payment URL and paid-feature wording.
-- [ ] Test activation and post-refund handling on a clean Chrome profile.
-- [ ] Do not accept real payment until the production key and public policy pages are final.
+- [x] Current release is free and open source; future Pro ideas are documented separately.
+- [ ] Paid Pro feature implemented and gated (future, not part of current release).
+- [ ] Offline signed license verifier and issuance tooling prepared (future, not part of current release).
+- [ ] Production license key pair generated and securely backed up (future, not part of current release).
+- [ ] Choose a payment provider and supported currency/region (future).
+- [ ] Confirm tax, refund, and customer-support handling (future).
+- [x] Current release has no payment URL or paid-feature wording.
+- [ ] Test activation and post-refund handling on a clean Chrome profile (future).
+- [x] No real payment is accepted in the current release.

@@ -48,23 +48,18 @@
 - Marquee promo tile：1400×560 PNG/JPEG；
 - Promo video：如提交，使用不含敏感业务信息的公开视频；
 - English 和 Simplified Chinese listing 文案；
+- 当前版本为免费开源版本，无付费入口。
 - Homepage URL、Support URL、Privacy Policy URL。
 
 截图内容见 `docs/store-screenshot-plan.md`，人工验收见 `docs/acceptance-matrix.md`。
 
-## 4. 付费与外部 checkout
+## 4. 当前免费开源发布
 
-Chrome Web Store listing 负责分发；Readmode Pro 由外部 checkout 完成。提交前必须：
-
-- 明确产品由谁销售；
-- 在官网/支付页显著展示价格、服务内容、退款规则和支持入口；
-- 不把支付密钥、Webhook 密钥、许可证私钥放入扩展；
-- 付费商品的支持联系方式保持有效；
-- 插件安装时明确核心免费能力与 Pro 边界。
+Chrome Web Store 和 GitHub 均分发当前免费开源版本。当前不配置外部 checkout、不收取费用、不要求账号，也不启用许可证激活流程。未来若引入独立授权或服务，会先更新官网、隐私政策、条款和发布流程。
 
 ## 5. 提交顺序
 
-1. 上传 `/Users/huangjingye/Documents/project/MD-HTML预览/dist/readmode-0.3.0-store.zip`；
+1. 上传 `/Users/huangjingye/Documents/project/MD-HTML预览/dist/readmode-0.3.0-community.zip`；
 2. 填写 Store Listing；
 3. 填写 Privacy practices、single purpose、权限理由、remote code 和数据使用声明；
 4. 填写 Distribution 与支持信息；

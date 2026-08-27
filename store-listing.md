@@ -18,7 +18,7 @@ Read Markdown files and preview HTML prototypes directly in Chrome.
 
 ## Full description
 
-Readmode turns Markdown files and HTML documents into a more comfortable browser reading and preview experience.
+Readmode is a free and open-source Chrome extension for reading Markdown files and previewing HTML documents and prototypes.
 
 ### Read Markdown files
 
@@ -36,13 +36,11 @@ Readmode turns Markdown files and HTML documents into a more comfortable browser
 - Run the original HTML only when you explicitly choose to do so.
 - Keep HTML prototypes visually separate from Readmode's controls.
 
-### Local-first and privacy-friendly
+### Local-first and open source
 
-Readmode processes documents in your browser. It does not upload document contents to a Readmode server. Authenticated links are fetched using your existing browser session when you choose to preview them.
+Readmode processes documents in your browser and does not upload document contents to a Readmode server. Authenticated links are fetched using your existing browser session when you choose to preview them.
 
-### Pro
-
-Readmode's core reading path is free. Readmode Pro adds optional local reading comfort features, currently including custom typography, text scale, and line-height controls. The official website and checkout disclose the current price, license terms, and refund policy before payment.
+The source code is available under the MIT License. Readmode does not require an account, subscription, or payment to use its current features.
 
 ### How to use
 
@@ -66,6 +64,6 @@ Markdown reader, Markdown viewer, Markdown preview, HTML preview, HTML prototype
 
 ## Store compliance notes
 
-- Do not publish the current development license key as a paid entitlement.
-- Replace the support URL, privacy URL, store URL, and final screenshots before submission.
 - Keep the listing explicit about the HTML original-runtime action and its trust boundary.
+- Do not make claims about features that are not included in the uploaded package.
+- The current release is free and open source; there is no paid activation flow.

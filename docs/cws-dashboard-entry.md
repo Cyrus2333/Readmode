@@ -4,8 +4,8 @@ Use this document to enter the CWS dashboard fields consistently. It does **not*
 
 ## Package
 
-- File: `dist/readmode-0.3.0-store.zip` (private Store build; do not upload the Community ZIP)
-- SHA-256: run `shasum -a 256 dist/readmode-0.3.0-store.zip` immediately before upload.
+- File: `dist/readmode-0.3.0-community.zip` (current free open-source release)
+- SHA-256: run `shasum -a 256 dist/readmode-0.3.0-community.zip` immediately before upload.
 - Version: `0.3.0`
 - Submission mode: choose **deferred publishing** if the dashboard offers it, so review approval does not automatically make the extension public.
 
@@ -34,7 +34,7 @@ Use this document to enter the CWS dashboard fields consistently. It does **not*
 
 ### Permission reasons
 
-- `storage`: Stores reader preferences, preview content used only for the active local browser workflow, and a user-pasted offline license record. It does not create a cloud copy of documents.
+- `storage`: Stores reader preferences and temporary preview content used only for the active local browser workflow. It does not create a cloud copy of documents.
 - `tabs`: Opens the Readmode viewer after a user action and returns to the source tab if the user selects the original HTML runtime.
 - `contextMenus`: Provides the user-initiated “Open in Readmode” context-menu action.
 - Host access (`http`, `https`, and user-enabled local file URLs): Reads Markdown/HTML documents that the user opens or explicitly sends to Readmode. The extension does not read ordinary HTML page content merely because a URL ends in `.html`.
@@ -46,9 +46,15 @@ Select **No**: all extension JavaScript, CSS, and HTML ship in the ZIP. A docume
 ### Data handling
 
 - The extension does not upload document contents to a Readmode service.
-- It stores reader preferences, temporary preview content, and an offline license record in the browser.
+- It stores reader preferences and temporary preview content in the browser.
 - It uses the user's existing browser session only when the user chooses to open an authenticated document link.
 - It does not use analytics or advertising and does not sell or transfer user data.
+
+## Current release model
+
+- Free and open source under the MIT License.
+- No account, subscription, payment, or license activation is required.
+- `src/pro/` is not part of the public repository or Community package.
 
 ## Final public URLs
 
@@ -65,6 +71,6 @@ Do not upload until all are true:
 - `npm run preflight` reports no owner-input waits.
 - `npm run release:check` passes.
 - The ZIP checksum is regenerated and matches the handoff record.
-- Final screenshots and both promo tiles exist and contain no sensitive data.
-- The final public website, privacy policy, terms/refund policy, and support channel are reachable.
-- A production public license key is configured, backed up securely, and the private key is absent from the project.
+- Final screenshots exist and contain no sensitive data; promotional tiles are optional for the current free release.
+- The final public website, privacy policy, terms, and support channel are reachable.
+- The current free release does not include a payment or license activation flow.

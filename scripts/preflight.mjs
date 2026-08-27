@@ -37,8 +37,8 @@ for (const page of ['index.html', 'privacy.html', 'pro.html', 'terms.html', 'sup
 }
 
 const config = await readFile(path.join(root, 'src/commercial-config.js'), 'utf8');
-if (/paymentUrl:\s*['"]['"]/.test(config)) warn('支付入口', '尚未配置 paymentUrl，不应接受真实付款');
-else pass('支付入口');
+if (/paymentUrl:\s*['"]['"]/.test(config)) pass('免费版未配置支付入口');
+else fail('免费版支付入口', '当前开源版本不应配置收费链接');
 if (/supportUrl:\s*['"]['"]/.test(config)) warn('支持入口', '尚未配置 supportUrl');
 else pass('支持入口');
 if (/publicSiteUrl:\s*['"]['"]/.test(config)) warn('官网入口', '尚未配置 publicSiteUrl');
@@ -50,7 +50,7 @@ try {
   if (source.includes('PUBLIC_KEY_JWK')) pass('Store 构建许可证模块仅包含公钥');
   else fail('Store 构建许可证模块仅包含公钥');
 } catch (error) {
-  if (error?.code === 'ENOENT') warn('Store 构建许可证模块', 'Community 源码不包含 Pro 实现；发布 Store 版时需在私有环境提供');
+  if (error?.code === 'ENOENT') pass('免费版不包含商业许可证模块');
   else throw error;
 }
 const privateNames = (await readdir(root, { recursive: true })).filter((name) => /private.*\.(pem|key)$/i.test(name));

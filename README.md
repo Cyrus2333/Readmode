@@ -1,66 +1,41 @@
 # Readmode
 
-Readmode is a local-first Chrome extension for reading Markdown files and previewing HTML documents and prototypes.
+Readmode 是一个免费、开源、local-first 的 Chrome 扩展，用于阅读 Markdown 文件和预览 HTML 文档与原型。
 
-## Product promise
+## 产品定位
 
-- Read Markdown files and attachment links directly in Chrome.
-- Preview HTML prototypes without losing their original layout and styles.
-- Use a safe HTML preview by default, and run original HTML only after an explicit choice.
-- Keep document processing in the browser instead of uploading documents to a Readmode backend.
+- 在 Chrome 中直接阅读本地 Markdown 文件和已登录的附件链接。
+- 在不丢失原始布局和样式的情况下预览 HTML 文档与原型。
+- 默认使用安全 HTML 预览；只有用户明确选择后才运行原始 HTML。
+- 文档内容在浏览器中处理，不上传到 Readmode 后端。
+- 当前不要求账号、不收费、不包含云端文档存储。
 
-## Current capabilities
+## 当前能力
 
-- Local `.md`, `.markdown`, `.mkd`, `.mdx`, `.html`, and `.htm` files.
-- Online Markdown / HTML links, including authenticated document links that the browser can already access.
-- Full-screen Markdown layout with a permanent left table of contents and a fluid document area.
-- Tables, task lists, blockquotes, GitHub-style alerts, images, links, code blocks, dark mode, source view, and Markdown printing.
-- Full-screen safe HTML preview that preserves document styles.
-- Explicit “Run original HTML” action for interactive prototypes.
-- Settings page with auto-render preference, per-page processing rules from the extension menu, Markdown theme, and reader width.
-- The official Store Edition additionally includes Pro-gated local typography controls: font family, text scale, and line height.
+- 本地 `.md`、`.markdown`、`.mkd`、`.mdx`、`.html` 和 `.htm` 文件。
+- 在线 Markdown / HTML 链接，包括浏览器当前登录态可以访问的文档附件。
+- 全屏 Markdown 布局、永久左侧目录和流式正文区域。
+- 表格、任务列表、引用、GitHub 风格提示块、图片、链接、代码块、深色模式、源码查看和 Markdown 打印。
+- 保留页面样式的全屏 HTML 安全预览。
+- 用户主动选择后的“运行原始 HTML”交互预览。
+- 设置页中的自动渲染、页面处理规则、Markdown 主题和正文宽度设置。
 
+## 开源与贡献
 
-## Open-source and commercial editions
+Readmode 以 MIT License 开放。欢迎通过 GitHub Issues 提交问题、分享不含敏感信息的样例，或发起 Pull Request。
 
-This repository contains **Readmode Community Edition**, the open-source local-first core. It is licensed under the MIT License.
+当前版本没有商业授权、订阅或付费门槛。未来如果增加独立服务或其他授权形式，会先根据真实使用反馈重新评估，并单独说明规则。
 
-The official Chrome Web Store package is built separately and contains the Community core plus proprietary, optional Readmode Pro functionality. The Pro implementation is not included in this public repository. `npm run package:community` creates the public package; `npm run package:store` is intended for the private release environment where `src/pro/license.js` is available.
-
-See `COMMUNITY.md` for contribution and trademark boundaries.
-
-## Local development
-
-1. Open `chrome://extensions`.
-2. Enable Developer mode.
-3. Click “Load unpacked”.
-4. Select this project directory.
-5. Enable “Allow access to file URLs” in the extension details when testing local files.
-
-Run checks and build the public Community package:
+## 本地开发
 
 ```bash
 npm run check
 npm run preflight
-npm run package
+npm run package:community
 ```
 
-The public package is written to `dist/readmode-0.3.0-community.zip`. The private Chrome Web Store build must be created in the commercial release environment with `npm run check:store && npm run package:store`; it writes `dist/readmode-0.3.0-store.zip` and its SHA-256 checksum.
+`npm run package:community` 会生成不包含私有目录的 Community Edition。`src/pro/` 如果存在，仅作为未来实验的本地私有目录，不属于公开源码和当前发布包。
 
-## Product and release preparation
+## 隐私与安全
 
-- `store-listing.md` — Chrome Web Store copy and keyword strategy.
-- `privacy-policy.md` — local-first privacy policy source.
-- `docs/store-submission.md` — store metadata, permissions, screenshots, and manual acceptance.
-- `docs/release-checklist.md` — product, security, store, and commercial release checklist.
-- `docs/acceptance-matrix.md` — final Chrome manual acceptance matrix.
-- `docs/licensing.md` — offline license key generation and issuance process.
-- `docs/commercial-launch.md` — payment-provider-neutral launch plan.
-- `docs/commercial-owner-inputs.md` — owner decisions needed before public sales.
-- `site/` — static product website, privacy page, terms draft, Pro page, and support page.
-
-## Commercial boundary
-
-The extension runtime is intentionally front-end only. The current build does not connect to a payment provider or license server. Pro activation uses an offline ECDSA signature; the extension contains only a public key. Before accepting real payments, generate a production key pair, replace the public key, configure a third-party checkout, and configure a real support/privacy URL. Use `npm run commercial:configure -- --help` to update the three public URLs without editing the source manually.
-
-The static website can be deployed independently to GitHub Pages, Cloudflare Pages, or another static host. The extension itself must continue to work if that website is unavailable.
+请阅读 [`privacy-policy.md`](privacy-policy.md) 和官网上的[隐私政策](https://cyrus2333.github.io/Readmode/privacy.html)。提交 issue、截图或补丁时，请移除私人文档、客户数据、账号信息、激活码和其他秘密。
