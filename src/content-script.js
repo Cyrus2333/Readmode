@@ -94,12 +94,14 @@
   }
 
   async function readLocalText() {
-    if (text.trim()) return text;
+    // Read the file bytes first. Another extension may have replaced the local
+    // document DOM with a reader shell, and falling back to body text first
+    // would copy that shell's footer/navigation into the Markdown source.
     try {
       const response = await fetch(source);
       if (response.ok) return await response.text();
     } catch {}
-    return document.querySelector('pre')?.textContent || document.body?.textContent || '';
+    return sourcePre?.textContent || document.querySelector('pre')?.textContent || document.body?.textContent || '';
   }
 
   function normalizePageKey(value) {

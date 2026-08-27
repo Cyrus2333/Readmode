@@ -96,6 +96,11 @@ assert.match(contentScript, /const shouldInspectText = hasMarkdownExtension \|\|
 assert.match(contentScript, /function looksLikeHtmlDocument\(value\)/);
 assert.match(contentScript, /pageModes/);
 assert.doesNotMatch(contentScript, /const isCandidate = hasMarkdownExtension \|\| hasHtmlExtension/);
+const localTextStart = contentScript.indexOf('async function readLocalText()');
+const localTextEnd = contentScript.indexOf('\n  function normalizePageKey', localTextStart);
+assert.ok(localTextStart >= 0 && localTextEnd > localTextStart, 'readLocalText should remain present');
+const localTextSource = contentScript.slice(localTextStart, localTextEnd);
+assert.ok(localTextSource.indexOf('fetch(source)') < localTextSource.indexOf('document.body?.textContent'), 'local files should prefer raw source over rewritten DOM text');
 
 const storePrototype = await readFile(new URL('../examples/store-prototype.html', import.meta.url), 'utf8');
 assert.match(storePrototype, /id="open-notes"/);
