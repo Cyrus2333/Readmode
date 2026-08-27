@@ -63,6 +63,7 @@ function setupViewerMenu() {
     ? (viewerHtmlMode ? '当前页面运行原始 HTML · JS 已启用' : '当前页面已由 Readmode 渲染 · 安全模式')
     : '当前页面已由 Readmode 优化阅读';
   const actions = [
+    ...(pageKey ? [{ action: 'return-original', label: '返回原页面' }] : []),
     { action: 'raw', label: '查看原文' },
     ...(viewerKind === 'markdown'
       ? [{ action: 'theme', label: '切换深色模式' }]
@@ -85,6 +86,10 @@ function setupViewerMenu() {
     }
     button.addEventListener('click', async () => {
       try {
+        if (action === 'return-original') {
+          await returnToOriginalPage();
+          return;
+        }
         if (action === 'toggle-html-mode' && isViewer && viewerKind === 'html') {
           await navigateViewerHtmlMode();
           return;
@@ -102,6 +107,12 @@ function setupViewerMenu() {
     });
     viewerActions.appendChild(button);
   });
+}
+
+async function returnToOriginalPage() {
+  if (!tab?.id || !pageSource) throw new Error('未找到原页面地址');
+  await chrome.tabs.update(tab.id, { url: markOriginalPage(pageSource) });
+  window.close();
 }
 
 async function navigateViewerHtmlMode() {
@@ -138,12 +149,12 @@ async function changePageRule(nextMode) {
       : '已恢复按内容自动判断。';
 
   if (isViewer && pageSource && (nextMode === 'auto' || nextMode === 'never')) {
-    await chrome.tabs.update(tab.id, { url: stripReadmodeMarker(pageSource) });
+    await chrome.tabs.update(tab.id, { url: markOriginalPage(pageSource) });
     window.close();
     return;
   }
   if (!isViewer && nextMode === 'always' && tab?.id) {
-    await chrome.tabs.reload(tab.id);
+    await chrome.tabs.update(tab.id, { url: stripReadmodeMarkers(tab.url) });
     window.close();
   }
 }
@@ -185,10 +196,24 @@ function normalizePageKey(value) {
   }
 }
 
-function stripReadmodeMarker(value) {
+function markOriginalPage(value) {
+  try {
+    const original = new URL(value);
+    const hashParts = original.hash.replace(/^#/, '').split('&').filter(Boolean)
+      .filter((part) => part !== 'readmode-open' && part !== 'readmode-original');
+    hashParts.push('readmode-original');
+    original.hash = hashParts.join('&');
+    return original.href;
+  } catch {
+    return value;
+  }
+}
+
+function stripReadmodeMarkers(value) {
   try {
     const clean = new URL(value);
-    clean.hash = clean.hash.replace(/^#/, '').split('&').filter(Boolean).filter((part) => part !== 'readmode-open').join('&');
+    clean.hash = clean.hash.replace(/^#/, '').split('&').filter(Boolean)
+      .filter((part) => part !== 'readmode-open' && part !== 'readmode-original').join('&');
     return clean.href;
   } catch {
     return value;

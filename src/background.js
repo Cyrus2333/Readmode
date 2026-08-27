@@ -64,7 +64,11 @@ async function openInlineViewer({ name, content, contentType, source }, tabId) {
   const id = crypto.randomUUID();
   await chrome.storage.session.set({ [`readmode:inline:${id}`]: { name, content, contentType, source } });
   const kind = /text\/html|application\/xhtml/i.test(contentType || '') ? 'html' : 'markdown';
-  const viewer = chrome.runtime.getURL(`src/viewer.html?inline=${id}&kind=${kind}`);
+  const viewerUrl = new URL(chrome.runtime.getURL('src/viewer.html'));
+  viewerUrl.searchParams.set('inline', id);
+  viewerUrl.searchParams.set('kind', kind);
+  if (source) viewerUrl.searchParams.set('source', source);
+  const viewer = viewerUrl.href;
   if (tabId) await chrome.tabs.update(tabId, { url: viewer });
   else await chrome.tabs.create({ url: viewer });
 }

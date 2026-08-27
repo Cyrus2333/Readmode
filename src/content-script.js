@@ -9,6 +9,7 @@
   const hasMarkdownExtension = /\.(md|markdown|mkd|mdx)$/i.test(path);
   const hasHtmlExtension = /\.(html?|xhtml)$/i.test(path);
   const isManualOpen = url.hash.replace(/^#/, '').split('&').includes('readmode-open');
+  const isOriginalPage = url.hash.replace(/^#/, '').split('&').includes('readmode-original');
   const isSupportedLocalFile = url.protocol === 'file:' && (hasMarkdownExtension || hasHtmlExtension);
   const pageKey = normalizePageKey(source);
 
@@ -40,7 +41,10 @@
     });
   }
 
-  if (source.includes('chrome-extension://') || url.hash.includes('readmode-original')) return;
+  if (source.includes('chrome-extension://') || isOriginalPage) {
+    if (isOriginalPage) clearOriginalPageMarker(url);
+    return;
+  }
   if (!shouldOpen) return;
   await openCandidate();
 
@@ -112,5 +116,12 @@
     } catch {
       return value;
     }
+  }
+
+  function clearOriginalPageMarker(currentUrl) {
+    const hashParts = currentUrl.hash.replace(/^#/, '').split('&').filter(Boolean)
+      .filter((part) => part !== 'readmode-original');
+    currentUrl.hash = hashParts.join('&');
+    history.replaceState(null, '', currentUrl.href);
   }
 })();

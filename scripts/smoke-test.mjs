@@ -74,6 +74,10 @@ assert.match(popupSource, /chrome\.tabs\.update\(tab\.id, \{ url: next\.href \}\
 assert.match(popupSource, /targetViewerUrl: tab\.url/);
 assert.match(popupSource, /aria-pressed/);
 assert.match(popupSource, /mode-switch/);
+assert.match(popupSource, /label: '返回原页面'/);
+assert.match(popupSource, /async function returnToOriginalPage\(\)/);
+assert.match(popupSource, /function markOriginalPage\(value\)/);
+assert.match(popupSource, /readmode-original/);
 
 const optionsHtml = await readFile(new URL('../src/options.html', import.meta.url), 'utf8');
 const optionsJs = await readFile(new URL('../src/options.js', import.meta.url), 'utf8');
@@ -84,7 +88,8 @@ assert.doesNotMatch(optionsJs, /verifyLicenseToken/);
 
 const backgroundSource = await readFile(new URL('../src/background.js', import.meta.url), 'utf8');
 assert.ok(backgroundSource.includes("const kind = /text\\/html|application\\/xhtml/i.test(contentType || '')"));
-assert.ok(backgroundSource.includes('viewer.html?inline=${id}&kind=${kind}'));
+assert.match(backgroundSource, /viewerUrl\.searchParams\.set\('inline', id\)/);
+assert.match(backgroundSource, /if \(source\) viewerUrl\.searchParams\.set\('source', source\)/);
 assert.ok(backgroundSource.includes('const source = info.linkUrl || tab?.url'));
 assert.match(backgroundSource, /contexts: \['page', 'link'\]/);
 assert.match(backgroundSource, /function registerContextMenu\(\)/);
@@ -95,6 +100,8 @@ const contentScript = await readFile(new URL('../src/content-script.js', import.
 assert.match(contentScript, /const shouldInspectText = hasMarkdownExtension \|\| isTextDocument \|\| Boolean\(sourcePre\)/);
 assert.match(contentScript, /function looksLikeHtmlDocument\(value\)/);
 assert.match(contentScript, /pageModes/);
+assert.match(contentScript, /const isOriginalPage = url\.hash/);
+assert.match(contentScript, /function clearOriginalPageMarker\(currentUrl\)/);
 assert.doesNotMatch(contentScript, /const isCandidate = hasMarkdownExtension \|\| hasHtmlExtension/);
 const localTextStart = contentScript.indexOf('async function readLocalText()');
 const localTextEnd = contentScript.indexOf('\n  function normalizePageKey', localTextStart);
