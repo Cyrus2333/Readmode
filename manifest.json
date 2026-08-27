@@ -2,14 +2,17 @@
   "manifest_version": 3,
   "name": "__MSG_extensionName__",
   "default_locale": "en",
-  "version": "0.3.3",
+  "version": "0.3.4",
   "description": "__MSG_extensionDescription__",
   "permissions": [
-    "activeTab",
     "contextMenus",
-    "scripting",
     "storage",
     "tabs"
+  ],
+  "host_permissions": [
+    "http://*/*",
+    "https://*/*",
+    "file:///*"
   ],
   "background": {
     "service_worker": "src/background.js",
@@ -35,6 +38,19 @@
     "page": "src/options.html",
     "open_in_tab": true
   },
+  "content_scripts": [
+    {
+      "matches": [
+        "http://*/*",
+        "https://*/*",
+        "file://*/*"
+      ],
+      "js": [
+        "src/content-script.js"
+      ],
+      "run_at": "document_idle"
+    }
+  ],
   "sandbox": {
     "pages": [
       "src/live.html"

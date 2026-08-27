@@ -7,6 +7,7 @@ import { COMMERCIAL_CONFIG } from './commercial-config.js';
 const commercial = EDITION === 'store' ? await import('./pro/store.js') : null;
 
 const defaults = {
+  autoRender: true,
   theme: 'system',
   readerWidth: 'wide',
   fontFamily: 'system',
@@ -17,6 +18,7 @@ const $ = (id) => document.querySelector(`#${id}`);
 $('#version').textContent = `v${chrome.runtime.getManifest().version}`;
 
 const settings = await chrome.storage.local.get(defaults);
+$('auto-render').checked = settings.autoRender !== false;
 $('theme').value = settings.theme || defaults.theme;
 $('reader-width').value = settings.readerWidth || defaults.readerWidth;
 if (commercial) await commercial.init({ settings, showStatus });
@@ -28,6 +30,7 @@ $('save-settings').addEventListener('click', async () => {
     return;
   }
   await chrome.storage.local.set({
+    autoRender: $('auto-render').checked,
     theme: $('theme').value,
     readerWidth: $('reader-width').value,
     ...proResult.values

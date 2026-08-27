@@ -1,12 +1,12 @@
-# Chrome Web Store Developer Dashboard entry sheet — Readmode 0.3.3
+# Chrome Web Store Developer Dashboard entry sheet — Readmode 0.3.4
 
 Use this document to enter the CWS dashboard fields consistently. It does **not** authorize publishing or payment collection by itself.
 
 ## Package
 
-- File: `dist/readmode-0.3.3-community.zip` (current free open-source release)
-- SHA-256: run `shasum -a 256 dist/readmode-0.3.3-community.zip` immediately before upload.
-- Version: `0.3.3`
+- File: `dist/readmode-0.3.4-community.zip` (current free open-source release)
+- SHA-256: run `shasum -a 256 dist/readmode-0.3.4-community.zip` immediately before upload.
+- Version: `0.3.4`
 - Submission mode: choose **deferred publishing** if the dashboard offers it, so review approval does not automatically make the extension public.
 
 ## Store Listing
@@ -35,14 +35,13 @@ Use this document to enter the CWS dashboard fields consistently. It does **not*
 ### Permission reasons
 
 - `storage`: Stores reader preferences and temporary preview content used only for the active local browser workflow. It does not create a cloud copy of documents.
-- `tabs`: Identifies the active tab after a user action and updates that tab to the local Readmode viewer for the document the user selected. It is not used to track browsing history.
-- `contextMenus`: Provides the user-initiated “Open current page in Readmode” context-menu action.
-- `activeTab`: Temporarily accesses only the current tab after the user clicks Readmode or chooses its context-menu action. It reads the document the user selected and access ends when they leave or close that tab.
-- `scripting`: Injects the packaged document-capture script only after that explicit open action, so Readmode can open the selected Markdown or HTML document locally. It is not persistently injected across websites.
+- `tabs`: Opens or updates the Readmode viewer for the current page or a selected link after a user action.
+- `contextMenus`: Provides the user-initiated “Open in Readmode” action on the current page or a selected link.
+- Host permissions (`http`, `https`, and `file`): Let Readmode recognize and read Markdown/HTML documents on pages the user opens or explicitly sends to Readmode, including the target of a selected link. The content script leaves ordinary HTML pages unchanged unless they are candidates or the user has configured an always-open rule.
 
 ### Remote code
 
-Select **Yes** and paste this justification: “Readmode does not download or execute remote extension code; all extension JavaScript, CSS, and HTML ship in the ZIP. Only when a user explicitly chooses Run original HTML may the selected document’s own scripts and external resources run inside an isolated Manifest V3 sandbox with no Chrome extension APIs, extension storage, cookies, or parent-page access. This is necessary to preview an interactive HTML prototype that the user selected.”
+Select **Yes** and paste this justification: “Readmode does not download or execute remote extension code; all extension JavaScript, CSS, and HTML ship in the ZIP. Only when the user explicitly selects Run original HTML may the selected document’s own scripts and external resources run inside an isolated Manifest V3 sandbox. This is necessary to preview an interactive HTML prototype selected by the user.”
 
 ### Data handling
 

@@ -36,5 +36,3 @@ input { display: none; }
 .hidden { display: none !important; }
 
 .popup-footer { display: flex; align-items: center; gap: 8px; margin-top: 10px; }
-
-.manual-hint { margin:8px 0 0; color:var(--muted); font-size:11px; line-height:1.5; }

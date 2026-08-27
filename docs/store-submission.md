@@ -4,7 +4,7 @@
 
 完整工作表见 `docs/cws-submission-worksheet.md`。提交时还需要填写 single purpose、权限用途、remote code、数据使用声明、Privacy Policy URL、Distribution 和 Support URL；这些字段不能只靠 manifest 自动完成。
 
-当前产品建议：remote code 选择 Yes，并如实说明只有用户明确选择“运行原始 HTML”后，所选文档的脚本和外部资源才会在隔离 sandbox 中运行；单一目的聚焦“用户主动打开的 Markdown 阅读与 HTML 文档/原型预览”。
+当前产品建议：remote code 选择 Yes，并说明仅所选 HTML 文档自身脚本会在隔离 sandbox 中运行；单一目的聚焦“本地优先的 Markdown 阅读与 HTML 文档/原型预览”。
 
 ## Listing
 
@@ -34,8 +34,8 @@
 
 - `storage`：保存用户偏好和一次性临时预览内容；
 - `tabs`：打开 Readmode viewer，并在用户选择时回到原始页面；
-- `contextMenus`：提供“在 Readmode 中打开”；
-- activeTab + scripting：仅在用户点击扩展按钮或右键菜单后，读取当前 Markdown / HTML 文档并在浏览器中预览；扩展不会在所有网站自动运行。
+- `contextMenus`：提供“在 Readmode 中打开”，支持当前页面和选定链接；
+- HTTP、HTTPS 和用户主动允许的本地文件网址：读取用户打开或明确发送到 Readmode 的 Markdown / HTML 文档，包括右键选定链接的目标；自动渲染可以在设置中关闭。
 
 ## 付费与条款
 
@@ -59,6 +59,6 @@ npm run package
 4. 测试 401/403、404、空文件、非 UTF-8、无扩展名 text/plain；
 5. 测试 HTML 样式、相对资源、安全预览和原始运行；
 6. 测试原文弹窗关闭按钮、遮罩点击和 Escape；
-7. 测试通过扩展按钮和右键菜单手动打开；
+7. 测试通过扩展按钮、当前页面右键菜单和选定链接右键菜单打开；
 8. 测试设置保存和离线许可证激活；
 9. 检查商店截图中不存在真实业务数据、私有域名或用户姓名。

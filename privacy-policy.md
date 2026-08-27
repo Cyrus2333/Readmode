@@ -18,10 +18,10 @@ Readmode 是一个免费、local-first 的 Chrome 扩展，用于阅读 Markdown
 
 ## 权限
 
-- `storage`：保存阅读偏好和当前预览所需的临时数据；
-- `tabs`：识别用户当前选择的标签页，并打开、更新或返回 Readmode 阅读页；
-- `contextMenus`：提供用户主动选择的“在 Readmode 中打开”菜单；
-- `activeTab` 与 `scripting`：仅在用户点击扩展按钮或选择右键菜单后，临时读取当前标签页或用户已允许访问的本地文件，用于生成阅读或预览页面。Readmode 不会在所有网站上常驻运行，也不会将这些权限用于广告、分析或无关的数据收集。
+- `storage`：保存偏好、页面处理规则和当前预览所需的临时数据；
+- `tabs`：识别当前标签页并打开、更新或返回 Readmode 阅读页；
+- `contextMenus`：提供用户主动选择的“在 Readmode 中打开”菜单，支持当前页面或选定链接；
+- 网站访问（HTTP、HTTPS 和用户主动允许的本地文件网址）：识别、读取和预览用户打开或明确发送到 Readmode 的 Markdown / HTML 文档，包括选定链接的目标文档。普通页面不会仅因 URL 匹配而被替换。Readmode 不会将这些权限用于广告、分析或无关的数据收集。
 
 ## Chrome Web Store Limited Use
 
