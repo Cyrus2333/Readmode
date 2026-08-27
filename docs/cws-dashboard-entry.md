@@ -1,12 +1,12 @@
-# Chrome Web Store Developer Dashboard entry sheet — Readmode 0.3.2
+# Chrome Web Store Developer Dashboard entry sheet — Readmode 0.3.3
 
 Use this document to enter the CWS dashboard fields consistently. It does **not** authorize publishing or payment collection by itself.
 
 ## Package
 
-- File: `dist/readmode-0.3.2-community.zip` (current free open-source release)
-- SHA-256: run `shasum -a 256 dist/readmode-0.3.2-community.zip` immediately before upload.
-- Version: `0.3.2`
+- File: `dist/readmode-0.3.3-community.zip` (current free open-source release)
+- SHA-256: run `shasum -a 256 dist/readmode-0.3.3-community.zip` immediately before upload.
+- Version: `0.3.3`
 - Submission mode: choose **deferred publishing** if the dashboard offers it, so review approval does not automatically make the extension public.
 
 ## Store Listing
@@ -36,7 +36,7 @@ Use this document to enter the CWS dashboard fields consistently. It does **not*
 
 - `storage`: Stores reader preferences and temporary preview content used only for the active local browser workflow. It does not create a cloud copy of documents.
 - `tabs`: Identifies the active tab after a user action and updates that tab to the local Readmode viewer for the document the user selected. It is not used to track browsing history.
-- `contextMenus`: Provides the user-initiated “Open in Readmode” context-menu action.
+- `contextMenus`: Provides the user-initiated “Open current page in Readmode” context-menu action.
 - `activeTab`: Temporarily accesses only the current tab after the user clicks Readmode or chooses its context-menu action. It reads the document the user selected and access ends when they leave or close that tab.
 - `scripting`: Injects the packaged document-capture script only after that explicit open action, so Readmode can open the selected Markdown or HTML document locally. It is not persistently injected across websites.
 

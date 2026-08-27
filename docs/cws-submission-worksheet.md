@@ -19,7 +19,7 @@
 | `activeTab` + `scripting` | 仅在用户点击扩展按钮或选择右键菜单后，临时读取当前标签页并注入随扩展发布的文档提取脚本；不在所有网站常驻运行。 |
 | `storage` | 保存用户阅读偏好和当前预览所需的临时内容；不建立云端文档副本。 |
 | `tabs` | 在用户点击扩展操作后打开或更新 Readmode viewer，并在用户选择时切换阅读页。 |
-| `contextMenus` | 提供用户主动选择的“在 Readmode 中打开当前文档”菜单。 |
+| `contextMenus` | 提供用户主动选择的“在 Readmode 中打开当前页面”菜单。 |
 
 ### Remote code
 
@@ -59,7 +59,7 @@ Chrome Web Store 和 GitHub 均分发当前免费开源版本。当前不配置�
 
 ## 5. 提交顺序
 
-1. 上传 `/Users/huangjingye/Documents/project/MD-HTML预览/dist/readmode-0.3.2-community.zip`；
+1. 上传 `/Users/huangjingye/Documents/project/MD-HTML预览/dist/readmode-0.3.3-community.zip`；
 2. 填写 Store Listing；
 3. 填写 Privacy practices、single purpose、权限理由、remote code 和数据使用声明；
 4. 填写 Distribution 与支持信息；

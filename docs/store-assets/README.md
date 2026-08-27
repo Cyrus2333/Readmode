@@ -1,4 +1,4 @@
-# Chrome Web Store listing assets — Readmode 0.3.2
+# Chrome Web Store listing assets — Readmode 0.3.3
 
 This directory is the final handoff location for the visual assets uploaded to the Chrome Web Store Developer Dashboard.
 
@@ -20,5 +20,5 @@ This directory is the final handoff location for the visual assets uploaded to t
 
 - Capture only from the release candidate loaded in Chrome.
 - Do not show private URLs, customer content, user names, credentials, order data, or source-code secrets.
-- Keep the extension name, UI language, and store copy consistent with the submitted 0.3.2 ZIP.
+- Keep the extension name, UI language, and store copy consistent with the submitted 0.3.3 ZIP.
 - Do not upload placeholder graphics. Before submission, add the remaining required listing assets and run `npm run release:check`.
