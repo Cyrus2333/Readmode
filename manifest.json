@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "__MSG_extensionName__",
   "default_locale": "en",
-  "version": "0.3.4",
+  "version": "0.3.9",
   "description": "__MSG_extensionDescription__",
   "permissions": [
     "contextMenus",
@@ -48,7 +48,8 @@
       "js": [
         "src/content-script.js"
       ],
-      "run_at": "document_idle"
+      "run_at": "document_idle",
+      "all_frames": true
     }
   ],
   "sandbox": {

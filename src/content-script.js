@@ -1,5 +1,5 @@
 (async () => {
-  if (window.top !== window) return;
+  const isTopFrame = window.top === window;
   if (!['http:', 'https:', 'file:'].includes(location.protocol)) return;
 
   const source = location.href;
@@ -12,6 +12,25 @@
   const isOriginalPage = url.hash.replace(/^#/, '').split('&').includes('readmode-original');
   const isSupportedLocalFile = url.protocol === 'file:' && (hasMarkdownExtension || hasHtmlExtension);
   const pageKey = normalizePageKey(source);
+  let cachedSelectionText = '';
+
+  // Cache the selection before the browser context menu opens. CodeMirror can
+  // clear the live DOM Selection on right-click, while contextMenus still
+  // provides a flattened selectionText to the background worker.
+  document.addEventListener('selectionchange', () => {
+    const text = getSelectedText();
+    if (text) cachedSelectionText = text;
+  }, true);
+
+  // Selection can happen inside the attachment preview iframe. Keep a small
+  // message bridge in every frame, while only the top frame runs auto-open.
+  chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+    if (message?.type === 'inspect-selection') {
+      sendResponse({ text: getSelectedText() || cachedSelectionText || getActiveCodeMirrorText(), ...(findAttachmentSource() || {}) });
+    }
+    if (message?.type === 'force-open-file-viewer' && isTopFrame) sendFileToViewer();
+  });
+  if (!isTopFrame) return;
 
   // Only inspect text when the browser is already presenting a text document,
   // or when an .html URL is visibly rendered as a source-only <pre>. A normal
@@ -32,14 +51,6 @@
   const pageMode = preferences.pageModes?.[pageKey] || 'auto';
   const shouldAutoOpen = preferences.autoRender !== false && pageMode !== 'never' && isCandidate;
   const shouldOpen = isManualOpen || pageMode === 'always' || shouldAutoOpen;
-
-  // Local HTML files are often rendered normally by Chrome. Keep the message
-  // bridge alive for an explicit popup/menu action without auto-opening them.
-  if (url.protocol === 'file:' && (isSupportedLocalFile || pageMode === 'always' || isManualOpen)) {
-    chrome.runtime.onMessage.addListener((message) => {
-      if (message?.type === 'force-open-file-viewer') sendFileToViewer();
-    });
-  }
 
   if (source.includes('chrome-extension://') || isOriginalPage) {
     if (isOriginalPage) clearOriginalPageMarker(url);
@@ -72,6 +83,196 @@
       contentType: isHtml ? 'text/html' : 'text/markdown',
       source
     }).catch(() => {});
+  }
+
+
+
+  function getSelectedText() {
+    const selection = window.getSelection();
+    if (!selection || selection.rangeCount === 0 || selection.isCollapsed) return '';
+
+    // Confluence's attachment viewer uses CodeMirror. Its visible source is
+    // split into one `.cm-line` element per logical line, while Chromium's
+    // context-menu selectionText can flatten those elements into one line.
+    const codeMirrorText = getCodeMirrorSelectionText(selection);
+    if (codeMirrorText) return normalizeSelectedText(codeMirrorText);
+
+    const range = selection.getRangeAt(0);
+    const fragment = range.cloneContents();
+    return normalizeSelectedText(readFragmentText(fragment));
+  }
+
+  function getCodeMirrorSelectionText(selection) {
+    const range = selection.getRangeAt(0);
+    const endpointNodes = [selection.anchorNode, selection.focusNode, range.startContainer, range.endContainer];
+    const roots = endpointNodes
+      .map((node) => closestElement(node, '.cm-content'))
+      .filter(Boolean);
+    const root = roots[0];
+    if (!root) return '';
+
+    const lines = [...root.querySelectorAll('.cm-line')];
+    if (!lines.length) return '';
+    const startLine = closestElement(range.startContainer, '.cm-line');
+    const endLine = closestElement(range.endContainer, '.cm-line');
+    const startIndex = startLine ? lines.indexOf(startLine) : -1;
+    const endIndex = endLine ? lines.indexOf(endLine) : -1;
+
+    // Ctrl+A may begin in the page chrome and finish inside the editor. In
+    // that case, use the editor's logical lines and exclude page header/footer.
+    if (startIndex < 0 || endIndex < 0) return lines.map((line) => line.textContent || '').join('\n');
+
+    const first = Math.min(startIndex, endIndex);
+    const last = Math.max(startIndex, endIndex);
+    if (first === last) return range.toString();
+
+    return lines.slice(first, last + 1).map((line, index) => {
+      const lineText = line.textContent || '';
+      if (index === 0 && startIndex === first) {
+        return lineText.slice(textOffsetWithin(line, range.startContainer, range.startOffset));
+      }
+      if (index === last - first && endIndex === last) {
+        return lineText.slice(0, textOffsetWithin(line, range.endContainer, range.endOffset));
+      }
+      return lineText;
+    }).join('\n');
+  }
+
+  function closestElement(node, selector) {
+    const element = node?.nodeType === Node.ELEMENT_NODE ? node : node?.parentElement;
+    return element?.closest?.(selector) || null;
+  }
+
+  function textOffsetWithin(root, node, offset) {
+    const prefix = document.createRange();
+    prefix.selectNodeContents(root);
+    prefix.setEnd(node, offset);
+    return prefix.toString().length;
+  }
+
+  function readFragmentText(node) {
+    if (node.nodeType === Node.TEXT_NODE) return node.nodeValue || '';
+    if (node.nodeType !== Node.ELEMENT_NODE && node.nodeType !== Node.DOCUMENT_FRAGMENT_NODE) return '';
+    if (node.nodeType === Node.ELEMENT_NODE && node.tagName === 'BR') return '\n';
+
+    let text = '';
+    for (const child of node.childNodes) text += readFragmentText(child);
+    if (node.nodeType === Node.ELEMENT_NODE && isLineBoundary(node)) text += '\n';
+    return text;
+  }
+
+  function isLineBoundary(element) {
+    return /^(?:ADDRESS|ARTICLE|ASIDE|BLOCKQUOTE|DIV|DL|DT|DD|FIELDSET|FIGCAPTION|FIGURE|FOOTER|FORM|H[1-6]|HEADER|HR|LI|MAIN|NAV|OL|P|PRE|SECTION|TABLE|TBODY|TD|TFOOT|TH|THEAD|TR|UL)$/.test(element.tagName);
+  }
+
+  function normalizeSelectedText(value) {
+    return value
+      .replace(/\r\n?/g, '\n')
+      .replace(/\u00a0/g, ' ')
+      .trim();
+  }
+
+  function getActiveCodeMirrorText() {
+    const roots = [...document.querySelectorAll('.atlaskit-portal-container .cm-content, [role=\"dialog\"] .cm-content, .cm-content')]
+      .filter((root) => root.querySelector('.cm-line'));
+    const root = roots.find((candidate) => {
+      const rect = candidate.getBoundingClientRect();
+      return rect.width > 0 && rect.height > 0;
+    }) || roots[0];
+    if (!root) return '';
+    return [...root.querySelectorAll('.cm-line')].map((line) => line.textContent || '').join('\n');
+  }
+
+  function findSniffedAttachmentSource() {
+    // Resource Timing keeps old requests around. Only use the sniffed URL when
+    // the attachment editor is visibly open, so a stale previous attachment
+    // cannot win a later unrelated text selection.
+    if (isTopFrame && !document.querySelector('.atlaskit-portal-container .cm-content, [role=\"dialog\"] .cm-content')) return null;
+
+    const pageId = location.pathname.match(/\/pages\/(\d+)(?:\/|$)/)?.[1] || '';
+    const entries = performance.getEntriesByType?.('resource') || [];
+    const candidates = entries.map((entry) => {
+      const source = entry.name;
+      let url;
+      try { url = new URL(source); } catch { return null; }
+      if (!['http:', 'https:'].includes(url.protocol)) return null;
+      const path = url.pathname.toLowerCase();
+      const search = url.searchParams;
+      let score = 0;
+      if (url.hostname === 'media-cdn.atlassian.com') score += 20;
+      if (/\/file\/[^/]+\/binary$/.test(path)) score += 20;
+      if (search.get('dl') === 'true') score += 4;
+      if (search.has('token') && search.has('Policy') && search.has('Signature')) score += 6;
+      if (pageId && search.get('collection') === `contentId-${pageId}`) score += 12;
+      if (score < 40) return null;
+      return { source, score, startTime: Number(entry.startTime) || 0 };
+    }).filter(Boolean);
+    candidates.sort((a, b) => b.score - a.score || b.startTime - a.startTime);
+    return candidates[0]?.source || null;
+  }
+
+  function findAttachmentSource() {
+    const sniffedSource = findSniffedAttachmentSource();
+    if (sniffedSource) return { source: sniffedSource };
+
+    if (!isTopFrame) {
+      const frameSource = normalizeAttachmentUrl(location.href, { allowCurrentPage: true });
+      if (frameSource && isLikelyAttachmentUrl(frameSource)) return { source: frameSource };
+    }
+
+    const roots = [];
+    const selection = window.getSelection();
+    const selectedElement = selection?.rangeCount
+      ? selection.getRangeAt(0).commonAncestorContainer?.parentElement
+      : null;
+    const dialog = selectedElement?.closest?.('dialog, [role="dialog"], .aui-dialog2, [data-testid*="dialog"]');
+    if (dialog) roots.push(dialog);
+    document.querySelectorAll('dialog[open], [role="dialog"], .aui-dialog2[aria-hidden="false"], [data-testid*="dialog"]').forEach((element) => {
+      if (!roots.includes(element)) roots.push(element);
+    });
+
+    const candidates = [];
+    for (const root of roots) {
+      root.querySelectorAll('iframe[src], a[href], [data-download-url], [data-url], [data-href]').forEach((element) => {
+        const value = element.getAttribute('src') || element.getAttribute('href')
+          || element.getAttribute('data-download-url') || element.getAttribute('data-url')
+          || element.getAttribute('data-href');
+        const source = normalizeAttachmentUrl(value);
+        if (!source) return;
+        const score = attachmentUrlScore(source) + (element.matches('iframe') ? 2 : 0);
+        candidates.push({ source, score });
+      });
+    }
+    candidates.sort((a, b) => b.score - a.score);
+    return candidates[0]?.score >= 5 ? { source: candidates[0].source } : null;
+  }
+
+  function normalizeAttachmentUrl(value, { allowCurrentPage = false } = {}) {
+    if (!value || /^(?:#|javascript:|mailto:|data:|blob:)/i.test(value)) return null;
+    try {
+      const candidate = new URL(value, location.href);
+      if (!['http:', 'https:', 'file:'].includes(candidate.protocol)) return null;
+      if (!allowCurrentPage && normalizePageKey(candidate.href) === pageKey) return null;
+      return candidate.href;
+    } catch {
+      return null;
+    }
+  }
+
+  function attachmentUrlScore(value) {
+    const candidate = new URL(value);
+    const path = candidate.pathname.toLowerCase();
+    const query = candidate.search.toLowerCase();
+    let score = 0;
+    if (/\/download\/attachments?\//.test(path)) score += 10;
+    if (/\/(?:attachments?|download)\//.test(path)) score += 6;
+    if (/\.(?:md|markdown|mkd|mdx|html?|xhtml|txt)(?:$|[?#])/.test(path)) score += 5;
+    if (/filename|attachment/.test(query)) score += 3;
+    return score;
+  }
+
+  function isLikelyAttachmentUrl(value) {
+    return attachmentUrlScore(value) >= 5;
   }
 
   function getSourcePre() {

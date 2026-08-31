@@ -1,3 +1,43 @@
+# Readmode 0.3.9
+
+## Confluence 资源嗅探预览
+
+- 优先从页面已加载的 Atlassian CDN 资源中识别真实附件地址。
+- 识别到 `media-cdn.atlassian.com/.../file/.../binary` 后直接读取完整附件，绕过选区文本和页头页脚干扰。
+- 资源未能识别时，继续使用 CodeMirror 逐行提取和选区缓存作为回退。
+
+# Readmode 0.3.8
+
+## 右键选区缓存修复
+
+- 缓存右键菜单打开前的源码选区，避免 CodeMirror 在右键后清空 DOM Selection。
+- 优先使用缓存的逐行 Markdown 内容，避免回退到 Chromium 已扁平化的 `selectionText`。
+
+# Readmode 0.3.7
+
+## Confluence Markdown 选区换行修复
+
+- 针对 Confluence 附件预览使用的 CodeMirror 源码容器，按 `.cm-line` 恢复逻辑换行。
+- 全选时优先提取源码编辑器内容，排除页头、页脚和行号区域。
+- 保留 Markdown 源码缩进、空行和行尾结构，避免多行内容被拼接成首行标题。
+
+# Readmode 0.3.6
+
+## 选区源码识别与换行修复
+
+- 优先从选区 DOM 恢复源码换行，改善 Confluence 中 Markdown 预览被拼成单行的问题。
+- 全选 HTML 源码时，自动裁剪混入的页头、页脚和其他外围文本。
+- 保留完整附件 URL 优先打开与选中文本回退预览逻辑。
+
+# Readmode 0.3.5
+
+## 选中源码预览
+
+- 新增“在 Readmode 中预览选中的源码”右键菜单。
+- 在 Confluence 附件弹窗中选中源码后，可在新标签页预览。
+- 优先识别弹窗中的完整附件地址，识别不到时回退到选中文本预览。
+- 保留原 Confluence 页面，不替换当前标签页。
+
 # Readmode 0.3.4
 
 - 恢复 0.3.0 的完整网页/链接右键打开能力：右键当前页面或选定链接都可在 Readmode 中打开。

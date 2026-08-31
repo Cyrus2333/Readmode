@@ -30,6 +30,9 @@ html { min-height: 100%; background: var(--bg); color: var(--text); font-family:
 body { min-height: 100vh; margin: 0; background: var(--bg); }
 button { font: inherit; }
 
+/* Selection fallback notice. */
+.source-note { position: fixed; top: 14px; right: 18px; z-index: 10; max-width: min(560px, calc(100% - 36px)); padding: 9px 12px; border: 1px solid color-mix(in srgb, var(--accent) 30%, var(--border)); border-radius: 8px; color: var(--muted); background: color-mix(in srgb, var(--surface) 94%, var(--accent)); box-shadow: 0 6px 24px rgba(31, 35, 41, .08); font-size: 12px; line-height: 1.5; }
+
 /* Markdown: permanent navigation rail + fluid reading canvas. */
 html:not(.html-mode) .layout { display: grid; grid-template-columns: clamp(190px, 18vw, 280px) minmax(0, 1fr); width: 100%; min-height: 100vh; }
 html:not(.html-mode) .toc { position: sticky; top: 0; align-self: start; height: 100vh; max-height: 100vh; overflow: auto; padding: 34px 22px 40px; border-right: 1px solid var(--border); background: color-mix(in srgb, var(--surface-muted) 70%, var(--bg)); }

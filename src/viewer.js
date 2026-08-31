@@ -8,9 +8,11 @@ const params = new URLSearchParams(location.search);
 const source = params.get('source');
 const localId = params.get('local');
 const inlineId = params.get('inline');
+const selectionPreview = params.get('selection') === '1';
 const reader = document.querySelector('#reader');
 const toc = document.querySelector('#toc');
 const errorBox = document.querySelector('#error');
+const sourceNote = document.querySelector('#source-note');
 const rawDialog = document.querySelector('#raw-dialog');
 const rawContent = document.querySelector('#raw-content');
 const loadingScreen = document.querySelector('#loading-screen');
@@ -30,7 +32,7 @@ async function init() {
       const file = result[`readmode:inline:${inlineId}`];
       if (!file) throw new Error('本地文件已失效，请重新打开。');
       rawText = file.content;
-      displayName = file.name || '本地文件';
+      displayName = file.selection ? '选中源码预览' : (file.name || '本地文件');
       contentType = file.contentType || '';
       baseUrl = file.source || '';
     } else if (localId) {
@@ -50,7 +52,10 @@ async function init() {
       throw new Error('没有找到要预览的文件。');
     }
 
-    mode = isHtml(source || displayName, contentType, rawText) ? 'html' : 'markdown';
+    mode = isHtml(source || displayName, contentType, rawText)
+      || (selectionPreview && params.get('kind') === 'html')
+      ? 'html'
+      : 'markdown';
     runOriginalHtml = mode === 'html' && params.get('htmlMode') === 'live';
     syncModeToUrl();
     await applyReaderPreferences();
@@ -104,6 +109,8 @@ function finishLoading() {
 function render() {
   errorBox.classList.add('hidden');
   document.title = `${stripExtension(displayName)} · Readmode`;
+  document.body.dataset.selectionPreview = String(selectionPreview);
+  sourceNote?.classList.toggle('hidden', !selectionPreview);
   document.documentElement.classList.toggle('html-mode', mode === 'html');
   document.body.classList.toggle('html-mode', mode === 'html');
 
