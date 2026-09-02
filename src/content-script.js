@@ -17,16 +17,47 @@
   // Cache the selection before the browser context menu opens. CodeMirror can
   // clear the live DOM Selection on right-click, while contextMenus still
   // provides a flattened selectionText to the background worker.
-  document.addEventListener('selectionchange', () => {
+  let selectionStateTimer = 0;
+  function reportSelectionState() {
     const text = getSelectedText();
     if (text) cachedSelectionText = text;
-  }, true);
+    const sourceLike = looksLikeSourceSelection(text) || Boolean(findAttachmentSource()?.source);
+    chrome.runtime.sendMessage({ type: 'selection-state', sourceLike }).catch(() => {});
+  }
+
+  document.addEventListener('selectionchange', reportSelectionState, true);
+
+  // Confluence can render an attachment source inside a dialog/iframe whose
+  // document does not receive this content script. The top document still
+  // exposes the dialog and attachment URL, so advertise source mode while
+  // that preview is open; the click-time check remains the final guard.
+  if (isTopFrame) {
+    const attachmentObserver = new MutationObserver(() => {
+      clearTimeout(selectionStateTimer);
+      selectionStateTimer = setTimeout(reportSelectionState, 50);
+    });
+    if (document.documentElement) {
+      attachmentObserver.observe(document.documentElement, {
+        childList: true,
+        subtree: true,
+        attributes: true,
+        attributeFilter: ['class', 'style', 'src', 'open', 'aria-hidden']
+      });
+    }
+    reportSelectionState();
+  }
 
   // Selection can happen inside the attachment preview iframe. Keep a small
   // message bridge in every frame, while only the top frame runs auto-open.
   chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     if (message?.type === 'inspect-selection') {
-      sendResponse({ text: getSelectedText() || cachedSelectionText || getActiveCodeMirrorText(), ...(findAttachmentSource() || {}) });
+      const text = getSelectedText() || cachedSelectionText || getActiveCodeMirrorText();
+      const attachment = findAttachmentSource();
+      sendResponse({
+        text,
+        sourceLike: looksLikeSourceSelection(text) || Boolean(attachment?.source),
+        ...(attachment || {})
+      });
     }
     if (message?.type === 'force-open-file-viewer' && isTopFrame) sendFileToViewer();
   });
@@ -86,6 +117,24 @@
   }
 
 
+
+  function looksLikeSourceSelection(value) {
+    const text = String(value || '').replace(/\r\n?/g, '\n').trim();
+    if (!text) return false;
+
+    const htmlTag = /(?:<!doctype\s+html\b|<!--(?:[\s\S]*?)-->|<\/?[a-z][a-z0-9-]*(?:\s+[^<>]{0,160})?\s*\/?>)/i;
+    const markdownPatterns = [
+      /(^|\n)\s{0,3}#{1,6}\s+\S/m,
+      /(^|\n)\s*(?:[-*+]\s+|\d+[.)]\s+)\S/m,
+      /```|~~~(?=\s|$)/,
+      /!?(?:\[[^\]\n]{1,200}\])\([^\)\n]*\)/,
+      /(^|\n)\s*>\s+\S/m,
+      /(^|\n)\s*[-*_](?:\s*[-*_]){2,}\s*(?:\n|$)/m,
+      /(?:^|\s)(?:\*\*|__)[^*\n]+(?:\*\*|__)(?=\s|$)/
+    ];
+
+    return htmlTag.test(text) || markdownPatterns.some((pattern) => pattern.test(text));
+  }
 
   function getSelectedText() {
     const selection = window.getSelection();

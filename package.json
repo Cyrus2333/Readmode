@@ -1,7 +1,7 @@
 {
   "name": "readmode-extension",
   "private": true,
-  "version": "0.3.9",
+  "version": "0.3.10",
   "type": "module",
   "scripts": {
     "icons": "python3 scripts/generate-icons.py",

@@ -1,5 +1,4 @@
 const MENU_ID = 'readmode-open';
-const SELECTION_MENU_ID = 'readmode-preview-selection';
 
 // Keep the original page + link behavior, while also recreating the menu when
 // Chrome starts the service worker after an unpacked extension reload.
@@ -14,23 +13,41 @@ function registerContextMenu() {
         console.warn('无法注册 Readmode 右键菜单：', chrome.runtime.lastError.message);
       }
     });
-    chrome.contextMenus.create({
-      id: SELECTION_MENU_ID,
-      title: '在 Readmode 中预览选中的源码',
-      contexts: ['selection']
-    }, () => {
-      if (chrome.runtime.lastError) {
-        console.warn('无法注册 Readmode 选区菜单：', chrome.runtime.lastError.message);
-      }
-    });
   });
 }
+
 
 chrome.runtime.onInstalled.addListener(registerContextMenu);
 chrome.runtime.onStartup.addListener(registerContextMenu);
 
+const selectionStateByTab = new Map();
+let activeTabId = null;
+
+chrome.tabs.onActivated.addListener(({ tabId }) => {
+  activeTabId = tabId;
+  updateContextMenuMode(tabId);
+});
+
+chrome.tabs.onRemoved.addListener((tabId) => {
+  selectionStateByTab.delete(tabId);
+  if (activeTabId === tabId) activeTabId = null;
+});
+
+chrome.tabs.onUpdated.addListener((tabId, changeInfo) => {
+  if (changeInfo.status !== 'loading') return;
+  selectionStateByTab.delete(tabId);
+  if (activeTabId === tabId) updateContextMenuMode(tabId);
+});
+
 chrome.contextMenus.onClicked.addListener(async (info, tab) => {
-  if (info.menuItemId === SELECTION_MENU_ID) {
+  if (info.menuItemId !== MENU_ID) return;
+
+  // Chrome's onClicked payload does not include the context list. Use the
+  // click payload and the last per-tab selection state instead; otherwise a
+  // selection click is mistaken for a page click and opens the Confluence URL.
+  const hasSelection = hasSourceSelection(tab?.id)
+    || looksLikeSourceSelection(String(info.selectionText || '').trim());
+  if (hasSelection) {
     await openSelectionPreview(info, tab);
     return;
   }
@@ -51,6 +68,19 @@ chrome.action.onClicked.addListener((tab) => {
 });
 
 chrome.runtime.onMessage.addListener((message, sender) => {
+  if (message?.type === 'selection-state' && sender.tab?.id != null) {
+    const tabId = sender.tab.id;
+    const frameId = sender.frameId || 0;
+    const states = selectionStateByTab.get(tabId) || new Map();
+    // A selection belongs to one frame at a time. Clear previous frame state
+    // so an old iframe selection cannot keep the source menu active.
+    states.clear();
+    states.set(frameId, message.sourceLike === true);
+    selectionStateByTab.set(tabId, states);
+    if (activeTabId == null) activeTabId = tabId;
+    if (activeTabId === tabId) updateContextMenuMode(tabId);
+    return;
+  }
   if (message?.type === 'open-viewer' && message.source) {
     openViewer(message.source, sender.tab?.id);
     return;
@@ -62,28 +92,33 @@ chrome.runtime.onMessage.addListener((message, sender) => {
 
 
 async function openSelectionPreview(info, tab) {
-  const context = tab?.id ? await inspectSelection(tab.id, info.frameId) : null;
-  let selection = String(context?.text || info.selectionText || '').trim();
-  if (!selection) return;
+  const frameContext = tab?.id ? await inspectSelection(tab.id, info.frameId) : null;
+  const context = frameContext || (tab?.id && info.frameId ? await inspectSelection(tab.id, 0) : null);
+  const selection = String(frameContext?.text || context?.text || info.selectionText || '').trim();
 
-  // Prefer the actual attachment URL when the page exposes one in its open
-  // dialog. This preserves relative links and lets the normal remote-source
-  // reader fetch the complete attachment with the browser's login state.
-  if (context?.source) {
+  // The selected source is the most precise payload. Confluence may expose a
+  // preview/page URL alongside the editor, and opening that URL can send the
+  // viewer back to the Confluence page instead of showing the selected code.
+  if (selection && looksLikeSourceSelection(selection)) {
+    const kind = guessContentKind(selection, tab?.url || '');
+    await openInlineViewer({
+      name: '选中源码',
+      content: kind === 'html' ? extractHtmlDocument(selection) : selection,
+      contentType: kind === 'html' ? 'text/html' : 'text/markdown',
+      source: tab?.url || '',
+      kind,
+      selection: true
+    });
+    return;
+  }
+
+  // Only fall back to a complete attachment when the discovered URL is a
+  // direct attachment/binary endpoint, never a Confluence page or preview URL.
+  if (isDirectAttachmentSource(context?.source)) {
     openViewer(context.source);
     return;
   }
 
-  const kind = guessContentKind(selection, tab?.url || '');
-  if (kind === 'html') selection = extractHtmlDocument(selection);
-  await openInlineViewer({
-    name: '选中源码',
-    content: selection,
-    contentType: kind === 'html' ? 'text/html' : 'text/markdown',
-    source: tab?.url || '',
-    kind,
-    selection: true
-  });
 }
 
 async function inspectSelection(tabId, frameId = 0) {
@@ -92,6 +127,57 @@ async function inspectSelection(tabId, frameId = 0) {
   } catch {
     return null;
   }
+}
+
+function hasSourceSelection(tabId) {
+  return [...(selectionStateByTab.get(tabId)?.values() || [])].some(Boolean);
+}
+
+function updateContextMenuMode(tabId) {
+  const sourceLike = hasSourceSelection(tabId);
+  chrome.contextMenus.update(MENU_ID, {
+    title: sourceLike ? '在 Readmode 中预览选中的源码' : '在 Readmode 中打开',
+    contexts: sourceLike ? ['selection'] : ['page', 'link']
+  }, () => {
+    if (!chrome.runtime.lastError) return;
+    // The service worker can receive a selection message before the menu has
+    // finished being recreated after extension reload. Re-register once.
+    registerContextMenu();
+  });
+}
+
+function isDirectAttachmentSource(value) {
+  if (!value) return false;
+  try {
+    const url = new URL(value);
+    if (!['http:', 'https:', 'file:'].includes(url.protocol)) return false;
+    const path = url.pathname.toLowerCase();
+    if (/\/wiki\/(?:pages?|spaces?|dashboard|login)(?:\/|$)/.test(path)) return false;
+    return url.hostname === 'media-cdn.atlassian.com'
+      || /\/file\/[^/]+\/binary(?:$|\/)/.test(path)
+      || /\/download\/attachments?\//.test(path)
+      || /\/(?:attachments?|download)\//.test(path) && /(?:filename|attachment|download)/i.test(url.search);
+  } catch {
+    return false;
+  }
+}
+
+function looksLikeSourceSelection(value) {
+  const text = String(value || '').replace(/\r\n?/g, '\n').trim();
+  if (!text) return false;
+
+  const htmlTag = /(?:<!doctype\s+html\b|<!--(?:[\s\S]*?)-->|<\/?[a-z][a-z0-9-]*(?:\s+[^<>]{0,160})?\s*\/?>)/i;
+  const markdownPatterns = [
+    /(^|\n)\s{0,3}#{1,6}\s+\S/m,
+    /(^|\n)\s*(?:[-*+]\s+|\d+[.)]\s+)\S/m,
+    /```|~~~(?=\s|$)/,
+    /!?(?:\[[^\]\n]{1,200}\])\([^\)\n]*\)/,
+    /(^|\n)\s*>\s+\S/m,
+    /(^|\n)\s*[-*_](?:\s*[-*_]){2,}\s*(?:\n|$)/m,
+    /(?:^|\s)(?:\*\*|__)[^*\n]+(?:\*\*|__)(?=\s|$)/
+  ];
+
+  return htmlTag.test(text) || markdownPatterns.some((pattern) => pattern.test(text));
 }
 
 function guessContentKind(content, source = '') {

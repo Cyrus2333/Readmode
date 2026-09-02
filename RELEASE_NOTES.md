@@ -1,3 +1,11 @@
+# Readmode 0.3.10
+
+## Confluence 附件源码预览修复
+
+- 选中源码后优先以内联内容预览，避免误加载当前 Confluence 页面。
+- 严格区分附件二进制地址与 Confluence 页面/预览地址。
+- 优化源码选区菜单识别，普通网页文本不再显示干扰项。
+
 # Readmode 0.3.9
 
 ## Confluence 资源嗅探预览
